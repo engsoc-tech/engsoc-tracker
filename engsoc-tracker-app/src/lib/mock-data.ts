@@ -1,23 +1,9 @@
 import { addDays } from 'date-fns'
+import { ApplicationType } from '../schemas/applications'
 
 const today = new Date('2024-11-17')
 
-export interface Application {
-    id: string
-    programme: string
-    company: string
-    type: string
-    engineering: string
-    openDate: string
-    closeDate: string
-    requiresCv: boolean
-    requiresCoverLetter: boolean
-    requiresWrittenAnswers: boolean
-    notes?: string
-    link: string
-}
-
-export const applications: Application[] = [
+export const applications: ApplicationType[] = [
     {
         id: "1",
         programme: "Graduate Engineer",
