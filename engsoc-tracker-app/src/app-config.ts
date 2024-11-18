@@ -1,0 +1,2 @@
+export const applicationName = 'Engsoc Opportunity Tracker';
+export const applicationDescription = 'Track internships, applications and placements for engineers from The University of Warwick Engineering Society'

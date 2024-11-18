@@ -6,7 +6,7 @@ export const maxDuration = 20;
 
 
 export async function POST(request: Request) {
-    const { siteUrl } = await request.json();
+  const { siteUrl } = await request.json();
 
   const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
   const browser = await puppeteer.launch({
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   await page.goto(siteUrl, {
     waitUntil: "networkidle2"
   });
-  const cookies = await page.evaluate(()=>document.cookie);
+  const cookies = await page.evaluate(() => document.cookie);
   console.log(cookies);
   const jobTitle = await page.$$eval("div", (titles) => {
     return titles.map((option) => option.textContent);
