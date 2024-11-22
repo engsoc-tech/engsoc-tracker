@@ -14,7 +14,7 @@ export function Navbar() {
                     height={48}
                     className="h-12 w-12"
                 />
-                <h1 className="font-semibold">Engineering Application Tracker</h1>
+                <h2 className="font-semibold">Engineering Application Tracker</h2>
             </div>
             <SettingsModal />
         </header>
