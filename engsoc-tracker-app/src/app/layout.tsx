@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { applicationDescription, applicationName } from "../app-config";
 import { mainFont } from "../lib/fonts";
+import { Navbar } from "../components/ui/Navbar";
 
 export const metadata: Metadata = {
   title: applicationName,
@@ -10,16 +11,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${mainFont.className} antialiased`}
-      >
-        {children}
+      <body className={mainFont.className}>
+        <Navbar />
+        <div className="flex min-h-screen flex-col items-center">
+          <main className="flex-1">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
-  );
+  )
 }

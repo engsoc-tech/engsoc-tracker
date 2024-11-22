@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatDate = (date: string) => {
+    const today = new Date()
     const parsedDate = parseISO(date)
     const daysFromNow = differenceInDays(parsedDate, today)
 
