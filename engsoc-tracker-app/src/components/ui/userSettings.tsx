@@ -20,9 +20,11 @@ export default function SettingsModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
+                {/* 
+                Future feature: User profile picture
                 <Button variant="ghost" className="rounded-full p-2 hover:bg-gray-100">
                     <UserCircle className="h-6 w-6 text-black" />
-                </Button>
+                </Button> */}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

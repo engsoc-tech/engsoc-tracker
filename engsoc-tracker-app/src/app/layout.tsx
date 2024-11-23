@@ -3,6 +3,7 @@ import "./globals.css";
 import { applicationDescription, applicationName } from "../app-config";
 import { mainFont } from "../lib/fonts";
 import { Navbar } from "../components/ui/Navbar";
+import { env } from "@/env";
 
 export const metadata: Metadata = {
   title: applicationName,
@@ -17,8 +18,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={mainFont.className}>
+        {
+          process.env.NODE_ENV !== "production" && (
+
+            <div className="bg-orange-500 text-white text-center py-2 font-bold">
+              TEST MODE
+            </div>
+          )}
+
         <Navbar />
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col text-base">
           <main className="flex-1">
             {children}
           </main>
