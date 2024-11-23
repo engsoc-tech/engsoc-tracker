@@ -56,9 +56,36 @@ datasource db {
 //     // googleId    String?     @unique
 // }
 
-// enum Role {
-//     MEMBER
-//     ADMIN
-// }
+enum Role {
+    MEMBER
+    ADMIN
+    SUPER
+}
 
 //BUSINESS LOGIC
+enum ApplicationType {
+    INTERNSHIP
+    PLACEMENT
+    GRADUATE_SCHEME
+}
+
+model Application {
+    id                     String          @id @default(auto()) @map("_id") @db.ObjectId
+    externalId             String?         @unique
+    programme              String?
+    company                String
+    jobTitle               String
+    type                   ApplicationType
+    engineering            String?
+    openDate               DateTime?
+    closeDate              DateTime?
+    requiresCv             Boolean?
+    requiresCoverLetter    Boolean?
+    requiresWrittenAnswers Boolean?
+    notes                  String?
+    link                   String          @unique
+    scrapedFrom            String
+    isSponsored            Boolean         @default(false)
+    createdAt              DateTime        @default(now())
+    updatedAt              DateTime        @default(now())
+}

@@ -1,25 +1,30 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-
 import { z } from 'zod'
-import { ApplicationSchema } from '@/schemas/ApplicationSchema'
 import { rateLimit } from '@/middleware/rateLimit'
+import { ApplicationSchema } from '@/schemas/applications'
+import { mockApplications } from '@/lib/mock-data'
 
-const app = new Hono()
+console.log('Initializing applications route')
 
-app.use('*', rateLimit({ limit: 100, period: 60000 })) // 100 requests per minute
+const applicationsRoute = new Hono()
 
-app.get('/', zValidator('query', z.object({
+applicationsRoute.use('*', rateLimit({ limit: 100, period: 60000 })) // 100 requests per minute
+
+applicationsRoute.get('/', zValidator('query', z.object({
     limit: z.number().optional().default(10),
     offset: z.number().optional().default(0)
 })), async (c) => {
+    console.log('Received GET request for applications')
     const { limit, offset } = c.req.valid('query')
+    console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
 
     try {
-        // Here you would typically fetch data from your database
         const applications = await fetchApplications(limit, offset)
+        console.log(`Fetched ${applications.length} applications`)
 
         const validatedApplications = z.array(ApplicationSchema).parse(applications)
+        console.log('Applications data validated successfully')
 
         return c.json({
             success: true,
@@ -27,6 +32,7 @@ app.get('/', zValidator('query', z.object({
         })
     } catch (error) {
         if (error instanceof z.ZodError) {
+            console.error('Validation error:', error.errors)
             return c.json({ success: false, error: 'Invalid data format' }, 400)
         }
         console.error('Error fetching applications:', error)
@@ -34,31 +40,13 @@ app.get('/', zValidator('query', z.object({
     }
 })
 
-// Mock function to simulate database query
 async function fetchApplications(limit: number, offset: number) {
-    // Simulate database query
+    console.log(`Simulating database query for applications (limit: ${limit}, offset: ${offset})`)
     await new Promise(resolve => setTimeout(resolve, 100))
     return mockApplications.slice(offset, offset + limit)
 }
 
-// Mock data (replace with actual database queries in production)
-const mockApplications = [
-    {
-        id: '1',
-        programme: 'Summer Internship',
-        company: 'Tech Corp',
-        type: 'Internship',
-        engineering: 'Software',
-        openDate: '2024-01-01T00:00:00Z',
-        closeDate: '2024-03-31T23:59:59Z',
-        requiresCv: true,
-        requiresCoverLetter: true,
-        requiresWrittenAnswers: false,
-        notes: 'Apply early for best consideration',
-        link: 'https://example.com/apply'
-    },
-    // Add more mock applications as needed
-]
+console.log('Applications route set up successfully')
 
-export default app
+export default applicationsRoute
 

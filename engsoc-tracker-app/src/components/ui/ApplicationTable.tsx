@@ -73,14 +73,22 @@ export default function ApplicationTable({ }) {
     const itemsPerPage = 5
     useEffect(() => {
         const fetchData = async () => {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setApplications(mockApplications)
-            setIsLoading(false);
-        };
+            try {
+                const response = await fetch('/api/applications')
+                if (!response.ok) {
+                    throw new Error('Failed to fetch applications')
+                }
+                const data = await response.json()
+                setApplications(data.data)
+            } catch (error) {
+                console.error('Error fetching applications:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
 
-        fetchData();
-    }, []);
+        fetchData()
+    }, [])
 
     const filteredApplications = useMemo(() => {
         return applications.filter(

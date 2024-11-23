@@ -73,24 +73,6 @@ const accordionContent = [
             </>
         ),
     },
-    // {
-    //     title: "Who are EngSoc?",
-    //     content: (
-    //         <div className="flex -space-x-4">
-    //             {societyMembers.map((member, index) => (
-    //                 <img
-    //                     key={index}
-    //                     src={member.link}
-    //                     alt={member.name}
-    //                     width={50}
-    //                     height={50}
-    //                     className="rounded-full border-2 border-white"
-    //                     style={{ zIndex: societyMembers.length - index }}
-    //                 />
-    //             ))}
-    //         </div>
-    //     ),
-    // },
 ];
 function Faqs({ }: Props) {
     return (

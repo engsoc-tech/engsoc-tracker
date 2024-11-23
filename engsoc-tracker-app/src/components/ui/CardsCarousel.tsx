@@ -34,13 +34,22 @@ export default function CardsCarousel() {
     }, [emblaApi])
     useEffect(() => {
         const fetchData = async () => {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            setCards(mockCards)
-            setIsLoading(false);
-        };
-        fetchData();
-    }, []);
+            try {
+                const response = await fetch('/api/cards')
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cards')
+                }
+                const data = await response.json()
+                setCards(data.data)
+            } catch (error) {
+                console.error('Error fetching cards:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [])
     return (
         <div className="w-full overflow-hidden" ref={emblaRef}>
             <div className="flex">
