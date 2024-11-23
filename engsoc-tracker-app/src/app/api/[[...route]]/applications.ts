@@ -12,11 +12,13 @@ const applicationsRoute = new Hono()
 applicationsRoute.use('*', rateLimit({ limit: 100, period: 60000 })) // 100 requests per minute
 
 applicationsRoute.get('/', zValidator('query', z.object({
-    limit: z.number().optional().default(10),
-    offset: z.number().optional().default(0)
+    _limit: z.string().optional().default("10"),
+    _offset: z.string().optional().default("0")
 })), async (c) => {
     console.log('Received GET request for applications')
-    const { limit, offset } = c.req.valid('query')
+    const { _limit, _offset } = c.req.valid('query')
+    const limit = parseInt(_limit)
+    const offset = parseInt(_offset)
     console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
 
     try {

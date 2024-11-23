@@ -4,7 +4,7 @@ export const ApplicationSchema = z.object({
     id: z.string(),
     programme: z.string(),
     company: z.string(),
-    type: z.enum(['Internship', 'Placement', 'Graduate-Scheme']),
+    type: z.enum(['Internship', 'Placement', 'Graduate']),
     engineering: z.string(),
     salary: z.string().optional(),
     location: z.string().optional(),

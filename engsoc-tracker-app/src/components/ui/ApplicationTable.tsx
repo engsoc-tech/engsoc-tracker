@@ -74,7 +74,7 @@ export default function ApplicationTable({ }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('/api/applications')
+                const response = await fetch('/api/applications?_limit=10&_offset=0')
                 if (!response.ok) {
                     throw new Error('Failed to fetch applications')
                 }
@@ -130,7 +130,7 @@ export default function ApplicationTable({ }) {
 
 
     const renderApplicationTable = () => (
-        <Table className="shadow-sm relative">
+        <Table className="shadow-sm relative" >
             <TableHeader className="sticky top-0  z-10">
                 <TableRow className="
               
@@ -220,9 +220,9 @@ export default function ApplicationTable({ }) {
     )
 
     return (
-        <>
+        <div className="flex flex-col justify-between h-full" >
 
-            <Tabs defaultValue="all" className="p-4" onValueChange={setSelectedType}>
+            <Tabs defaultValue="all" className="p-4 h-full" onValueChange={setSelectedType}>
 
                 <div className="flex flex-col items-center md:flex-row gap-4 mx-4 mb-6">
 
@@ -278,7 +278,7 @@ export default function ApplicationTable({ }) {
                     </TabsList>
 
                 </div>
-                <TabsContent value="all" className="mt-4">
+                <TabsContent value="all" className="mt-4" >
                     {renderApplicationTable()}
                 </TabsContent>
                 <TabsContent value="internship" className="mt-4">
@@ -306,6 +306,6 @@ export default function ApplicationTable({ }) {
                     Next <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
             </div>
-        </>
+        </div>
     )
 }

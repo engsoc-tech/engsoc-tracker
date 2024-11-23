@@ -27,7 +27,7 @@ export default function TrackingPage() {
       <main className="flex-1 ">
         <div className="bg-[#111111] p-6 rounded-b-xl">
           <section className="aboveTheTracker  text-white pt-2 pb-8">
-            <div className="max-w-4xl mx-auto flex flex-col items-center ">
+            <div className="max-w-4xl mx-auto flex flex-col items-center pt-4">
               <img className="brightness-90" src="https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/9a0457f5-7b28-4756-af5c-bc8dd7759cd6/engsoc+logo.png?format=2500w" width={200} alt="Warwick Engienering Society" />
               <h2 className="text-2xl font-bold mt-6 mb-3 text-gray-100 text-center">The #1 Application Tracker For Engineering Students</h2>
               <div className="space-y-4 mb-8 flex flex-col items-center">
@@ -39,16 +39,16 @@ export default function TrackingPage() {
               <Faqs />
             </div>
           </section>
-          <section className="aboveTheTracker mb-4 text-white ">
-            <div className="max-w-4xl mx-auto ">
-              <CardsCarousel />
-            </div>
-          </section>
         </div>
 
-        <div className="mt-8 p-6" id="mainArea">
+        <div className="mt-8 p-6 min-h-96" >
           <ApplicationTable />
         </div>
+        <section className="aboveTheTracker mb-4 text-white ">
+          <div className="max-w-4xl mx-auto ">
+            <CardsCarousel />
+          </div>
+        </section>
       </main>
       <footer className="bg-zinc-900 text-white py-8 px-6 pb-32  gap-4">
         <div className=" w-full">

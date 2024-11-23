@@ -21,7 +21,7 @@ export default function RootLayout({
         {
           process.env.NODE_ENV !== "production" && (
 
-            <div className="bg-orange-500 text-white text-center py-2 font-bold">
+            <div className="bg-orange-500 text-white sticky z-50 text-center left-0 right-0 py-2 font-bold">
               TEST MODE
             </div>
           )}

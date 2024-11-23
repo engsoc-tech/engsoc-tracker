@@ -59,7 +59,7 @@ async function scrapeGradcracker() {
       } else if (title.toLowerCase().includes('placement')) {
         type = 'Placement';
       } else {
-        type = 'Graduate-Scheme';
+        type = 'Graduate';
       }
       console.log(`Job type determined: ${type}`);
 

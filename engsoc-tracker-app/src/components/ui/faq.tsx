@@ -28,7 +28,7 @@ const accordionContent = [
         content: (
             <>
                 <div className="mt-4">
-                    <h4 className="text-lg font-semibold text-gray-100 mb-2">About us</h4>
+                    <h4 className="text-lg font-semibold text-gray-100 mb-4">About us</h4>
                     <div className="flex -space-x-4 mb-4">
                         {societyMembers.map((member, index) => (
                             <img
@@ -37,18 +37,18 @@ const accordionContent = [
                                 alt={member.name}
                                 width={50}
                                 height={50}
-                                className="rounded-full aspect-square border-2 border-white"
+                                className="rounded-full aspect-square brightness-75 border-2 border-white"
                                 style={{ zIndex: societyMembers.length - index }}
                             />
                         ))}
                     </div>
                 </div>
-                <p className="text-gray-300 leading-relaxed mb-4">
-                    The Warwick Engineering Society (EngSoc) is a student-run organization at the University of Warwick. We aim to bridge the gap between academia and industry, providing our members with valuable resources, networking opportunities, and events to enhance their engineering careers.
+                <p className="text-white leading-relaxed mb-4" id="mainArea">
+                    The Warwick Engineering Society (EngSoc) is a student-run organization at the University of Warwick. We're bridging the gap between academia and industry, providing our members with valuable resources, networking opportunities, and events to enhance their engineering careers.
                 </p>
-                <div className="mt-4">
-                    <h4 className="text-lg font-semibold text-gray-100 mb-2">Developed by:</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                <div className="mt-4" >
+                    <h4 className="text-lg font-semibold text-gray-100 mb-4 mt-2" >Developed by:</h4>
+                    <div className="grid grid-cols-2 gap-4" >
                         {developers.map((developer, index) => (
                             <div className='flex justify-between w-full'>
                                 <div key={index} className="flex items-center space-x-4 mb-4">
@@ -57,14 +57,14 @@ const accordionContent = [
                                         alt={developer.name}
                                         width={50}
                                         height={50}
-                                        className="rounded-full object-cover aspect-square border-2 border-black/50"
+                                        className="rounded-full  object-cover aspect-square border-2 border-black/50"
                                     />
                                     <div>
                                         <h5 className="text-md font-semibold text-gray-100">{developer.name}</h5>
                                         <p className="text-gray-300 text-sm">{developer.roleInProject}, {developer.roleInEngSoc} in EngSoc</p>
                                     </div>
                                 </div>
-                                {index !== developers.length - 1 && <Separator className='h-auto opacity-20' orientation='vertical' />}
+                                {index !== developers.length - 1 && <Separator className='h-auto opacity-10' orientation='vertical' />}
                             </div>
                         ))}
 
@@ -77,7 +77,7 @@ const accordionContent = [
 function Faqs({ }: Props) {
     return (
         <div className="bg-neutral-900/90 p-4 rounded-xl w-full">
-            <Accordion type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
+            <Accordion defaultValue='item-1' type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
                 {accordionContent.map((item, index) => (
                     <AccordionItem
                         key={index}
