@@ -28,6 +28,7 @@ import {
     CommandGroup,
     CommandInput,
     CommandItem,
+    CommandList,
 } from "@/components/ui/command"
 interface Application {
     id: string
@@ -119,8 +120,11 @@ export default function ApplicationTable({ applications }: { applications: Appli
 
     const renderApplicationTable = () => (
         <Table className="shadow-sm relative">
-            <TableHeader className="sticky top-0 bg-background z-10">
-                <TableRow>
+            <TableHeader className="sticky top-0  z-10">
+                <TableRow className="
+              
+
+                ">
                     <TableHead>Programme</TableHead>
                     <TableHead>Company</TableHead>
                     <TableHead className="hidden md:table-cell">Opening Date</TableHead>
@@ -158,7 +162,9 @@ export default function ApplicationTable({ applications }: { applications: Appli
                                 <TableRow key={app.id}>
                                     <TableCell className="font-medium">{app.programme}</TableCell>
                                     <TableCell>{app.company}</TableCell>
-                                    <TableCell className="hidden md:table-cell opacity-80"><TableCell>{format(new Date(app.openDate), 'dd/MM/yyyy')}</TableCell></TableCell>
+                                    <TableCell className="hidden md:table-cell opacity-80">{
+                                        format(new Date(app.openDate), 'dd/MM/yyyy')
+                                    }</TableCell>
                                     <TableCell>
                                         <Badge className={`${getDeadlineStatus(app.closeDate)} cursor-pointer`}>
                                             {formatDate(app.closeDate)}
@@ -204,57 +210,63 @@ export default function ApplicationTable({ applications }: { applications: Appli
 
     return (
         <>
-            <div className="mx-4 mt-4">
-                <Popover open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
-                            role="combobox"
-                            // aria-expanded={open}
-                            className="w-[200px] justify-between"
-                        >
-                            {selectedEngineering === "all"
-                                ? "All Engineering"
-                                : `${selectedEngineering} Engineering`}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                            <CommandInput placeholder="Search engineering..." />
-                            <CommandEmpty>No engineering type found.</CommandEmpty>
-                            <CommandGroup>
-                                {engineeringTypes.map((type) => (
-                                    <CommandItem
-                                        key={type}
-                                        value={type}
-                                        onSelect={(currentValue) => {
-                                            setSelectedEngineering(currentValue === selectedEngineering ? "all" : currentValue)
-                                            setCurrentPage(1)
-                                            setSearchDialogOpen(false)
-                                        }}
-                                    >
-                                        <Check
-                                            className={cn(
-                                                "mr-2 h-4 w-4",
-                                                selectedEngineering === type ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        {type === "all" ? "All Engineering" : `${type} Engineering`}
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </Command>
-                    </PopoverContent>
-                </Popover>
-            </div>
+
             <Tabs defaultValue="all" className="p-4" onValueChange={setSelectedType}>
-                <TabsList className="mx-4 flex flex-col sm:flex-row h-min  grid-cols-4 mb-6 bg-muted">
-                    <TabsTrigger className="flex-1 w-full" value="all">All</TabsTrigger>
-                    <TabsTrigger className="flex-1 w-full" value="internship">Internships</TabsTrigger>
-                    <TabsTrigger className="flex-1 w-full" value="placement">Placements</TabsTrigger>
-                    <TabsTrigger className="flex-1 w-full" value="graduate">Graduate Schemes</TabsTrigger>
-                </TabsList>
+
+                <div className="flex flex-col items-center md:flex-row gap-4 mx-4 mb-6">
+
+                    <Popover open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                // aria-expanded={open}
+                                className="flex-2 min-w-[300px] justify-between"
+                            >
+                                {selectedEngineering === "all"
+                                    ? "All Engineering"
+                                    : `${selectedEngineering} Engineering`}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                            <Command>
+                                <CommandList>
+                                    <CommandInput placeholder="Filter by type..." />
+                                    <CommandEmpty>No engineering type found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {engineeringTypes.map((type) => (
+                                            <CommandItem
+                                                key={type}
+                                                value={type}
+                                                onSelect={(currentValue) => {
+                                                    setSelectedEngineering(currentValue === selectedEngineering ? "all" : currentValue)
+                                                    setCurrentPage(1)
+                                                    setSearchDialogOpen(false)
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedEngineering === type ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {type === "all" ? "All Engineering" : `${type} Engineering`}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <TabsList className="flex flex-col sm:flex-row h-min flex-3 w-full grid-cols-4 bg-muted">
+                        <TabsTrigger className="flex-1 w-full" value="all">All</TabsTrigger>
+                        <TabsTrigger className="flex-1 w-full" value="internship">Internships</TabsTrigger>
+                        <TabsTrigger className="flex-1 w-full" value="placement">Placements</TabsTrigger>
+                        <TabsTrigger className="flex-1 w-full" value="graduate">Graduate Schemes</TabsTrigger>
+                    </TabsList>
+
+                </div>
                 <TabsContent value="all" className="mt-4">
                     {renderApplicationTable()}
                 </TabsContent>

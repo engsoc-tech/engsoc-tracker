@@ -70,18 +70,10 @@ const cards: CardProps[] = [ // Updated from mockCards to cards
   },
 ]
 
-const societyMembers = [
-  { name: "Darina Mollova", link: "https://www.linkedin.com/in/darina-mollova-52881a197/" },
-  { name: "Lily Hayes", link: "https://www.linkedin.com/in/hayes-lily/" },
-  { name: "Jash Navati", link: "https://www.linkedin.com/in/jashnanavati/" },
-  { name: "Mihir Annapureddy", link: "https://www.linkedin.com/in/mihir-annapureddy-18a567215/" },
-  { name: "Karam Sandhar", link: "https://www.linkedin.com/in/karam-sandhar/" },
-  { name: "Unknown Member", link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" },
-]
 
 const developers = [
   { name: "Developer 1", link: "https://media.licdn.com/dms/image/v2/D4E03AQFGV_qKseoGkw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729184073149?e=1737590400&v=beta&t=yELowMAMCezNDfqnfDJFWbXNxbN9bLyTuv7A5WQeGsg" },
-  { name: "Developer 2", link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" },
+  { name: "Ege Cavus", link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" },
 ]
 
 export default function TrackingPage() {
