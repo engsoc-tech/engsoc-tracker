@@ -1,74 +1,18 @@
 
 
-import Image from "next/image"
-import { Check, X, UserCircle, Instagram, Globe, Linkedin, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-import { useState, useEffect, useMemo, useCallback } from "react"
-import { formatDistanceToNowStrict, parseISO, addDays, format, differenceInDays } from 'date-fns'
-import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
+
+import { ExternalLink } from 'lucide-react'
+
 import ApplicationTable from '@/components/ui/ApplicationTable'
 import CardsCarousel from "@/components/ui/CardsCarousel"
 
 import { Button } from "@/components/ui/button"
-import { applications } from "@/lib/mock-data"
 import Link from "next/link"
 import { CardProps } from "@/components/ui/interfaces"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import ButtonScrollsToRef from "@/components/ui/goToTrackerButton"
+
 import GoToTrackerBtn from "@/components/ui/goToTrackerButton"
 import Faqs from "@/components/ui/faq"
 
-interface Application {
-  id: string
-  programme: string
-  company: string
-  type: string
-  engineering: string
-  openDate: string
-  closeDate: string
-  requiresCv: boolean
-  requiresCoverLetter: boolean
-  requiresWrittenAnswers: boolean
-  notes?: string
-  link: string
-}
-
-// interface CustomCard { //Removed as per update 1
-//   content: React.ReactNode
-// }
-
-
-
-// function isSimpleCard(card: CardProps): card is SimpleCard { //Removed as per update 3
-//   return 'bgColor' in card;
-// }
-
-const cards: CardProps[] = [ // Updated from mockCards to cards
-  {
-    bgImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
-    mainTitle: "Follow the Warwick Engineering Society",
-    subtitle: "Stay updated with our latest events and opportunities",
-    link: "https://warwick.ac.uk/fac/sci/eng/",
-    textColour: "text-white",
-    linkText: "Follow Us" // Updated to include linkText
-  },
-  {
-    bgImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
-    mainTitle: "Upcoming Events",
-    subtitle: "Join us for our next networking event on 25th November 2024!",
-    link: "https://warwick.ac.uk/fac/sci/eng/events/",
-    textColour: "text-white",
-    linkText: "View Events" // Updated to include linkText
-  },
-  {
-    bgImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
-    mainTitle: "Engineering Careers Fair",
-    subtitle: "Meet top employers and explore career opportunities",
-    link: "https://warwick.ac.uk/fac/sci/eng/careers/",
-    textColour: "text-white",
-    linkText: "Learn More" // Updated to include linkText
-  },
-]
 
 
 const developers = [
@@ -97,13 +41,13 @@ export default function TrackingPage() {
           </section>
           <section className="aboveTheTracker mb-4 text-white ">
             <div className="max-w-4xl mx-auto ">
-              <CardsCarousel cards={cards} />
+              <CardsCarousel />
             </div>
           </section>
         </div>
 
         <div className="mt-8 p-6" id="mainArea">
-          <ApplicationTable applications={applications} />
+          <ApplicationTable />
         </div>
       </main>
       <footer className="bg-zinc-900 text-white py-8 px-6 pb-32  gap-4">

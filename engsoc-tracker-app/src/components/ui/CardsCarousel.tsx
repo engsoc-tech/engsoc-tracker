@@ -13,12 +13,14 @@ import useEmblaCarousel from "embla-carousel-react"
 import { Skeleton } from "./skeleton"
 import { CardProps } from "./interfaces"
 import { Button } from "./button"
+import { mockCards } from "@/lib/mock-data"
 
 
 
-export default function CardsCarousel({ cards }: { cards: CardProps[] }) {
+export default function CardsCarousel() {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
     const [isLoading, setIsLoading] = useState(true);
+    const [cards, setCards] = useState<CardProps[]>([])
 
     useEffect(() => {
         if (emblaApi) {
@@ -34,9 +36,9 @@ export default function CardsCarousel({ cards }: { cards: CardProps[] }) {
         const fetchData = async () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 2000));
+            setCards(mockCards)
             setIsLoading(false);
         };
-
         fetchData();
     }, []);
     return (

@@ -1,7 +1,6 @@
 import React from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion';
 import { Separator } from './separator';
-
 type Props = {}
 const developers = [
     {
@@ -56,9 +55,9 @@ const accordionContent = [
                                     <img
                                         src={developer.link}
                                         alt={developer.name}
-                                        width={60}
-                                        height={60}
-                                        className="rounded-full object-cover aspect-square border-2 border-white"
+                                        width={50}
+                                        height={50}
+                                        className="rounded-full object-cover aspect-square border-2 border-black/50"
                                     />
                                     <div>
                                         <h5 className="text-md font-semibold text-gray-100">{developer.name}</h5>

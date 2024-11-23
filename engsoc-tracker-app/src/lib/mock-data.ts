@@ -1,9 +1,35 @@
 import { addDays } from 'date-fns'
 import { ApplicationType } from '../schemas/applications'
+import { CardProps } from '@/components/ui/interfaces'
 
 const today = new Date('2024-11-17')
-
-export const applications: ApplicationType[] = [
+export const mockCards: CardProps[] = [ // Updated from mockCards to cards
+    {
+        bgImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+        mainTitle: "Follow the Warwick Engineering Society",
+        subtitle: "Stay updated with our latest events and opportunities",
+        link: "https://warwick.ac.uk/fac/sci/eng/",
+        textColour: "text-white",
+        linkText: "Follow Us" // Updated to include linkText
+    },
+    {
+        bgImage: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+        mainTitle: "Upcoming Events",
+        subtitle: "Join us for our next networking event on 25th November 2024!",
+        link: "https://warwick.ac.uk/fac/sci/eng/events/",
+        textColour: "text-white",
+        linkText: "View Events" // Updated to include linkText
+    },
+    {
+        bgImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+        mainTitle: "Engineering Careers Fair",
+        subtitle: "Meet top employers and explore career opportunities",
+        link: "https://warwick.ac.uk/fac/sci/eng/careers/",
+        textColour: "text-white",
+        linkText: "Learn More" // Updated to include linkText
+    },
+]
+export const mockApplications: ApplicationType[] = [
     {
         id: "1",
         programme: "Graduate Engineer",

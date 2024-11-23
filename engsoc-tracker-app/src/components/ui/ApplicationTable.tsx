@@ -30,6 +30,7 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
+import { mockApplications } from "@/lib/mock-data"
 interface Application {
     id: string
     programme: string
@@ -61,9 +62,10 @@ const getDeadlineStatus = (closeDate: string) => {
 }
 
 
-export default function ApplicationTable({ applications }: { applications: Application[] }) {
+export default function ApplicationTable({ }) {
     const [selectedType, setSelectedType] = useState("all")
     const [currentPage, setCurrentPage] = useState(1)
+    const [applications, setApplications] = useState<Application[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [selectedEngineering, setSelectedEngineering] = useState("all")
     const [searchDialogOpen, setSearchDialogOpen] = useState(false)
@@ -73,6 +75,7 @@ export default function ApplicationTable({ applications }: { applications: Appli
         const fetchData = async () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 2000));
+            setApplications(mockApplications)
             setIsLoading(false);
         };
 
