@@ -91,10 +91,12 @@ export default function ApplicationTable({ }) {
     }, [])
 
     const filteredApplications = useMemo(() => {
+        //+ DO NOT RENDER APPLICATIONS THAT HAVE A CLOSED DATE BEFORE CLIENT NOW.
         return applications.filter(
             (app) =>
                 (selectedType === "all" || app.type.toLowerCase() === selectedType.toLowerCase()) &&
                 (selectedEngineering === "all" || app.engineering === selectedEngineering)
+                && parseISO(app.closeDate) > new Date()
         );
     }, [selectedType, selectedEngineering, applications]);
 

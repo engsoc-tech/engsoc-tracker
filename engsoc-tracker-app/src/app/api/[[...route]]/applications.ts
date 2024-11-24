@@ -1,11 +1,13 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { rateLimit } from '@/middleware/rateLimit'
-import { ApplicationSchema } from '@/schemas/applications'
-import { mockApplications } from '@/lib/mock-data'
+import { PrismaClient } from '@prisma/client'
 
-console.log('Initializing applications route')
+import { ApplicationSchema } from '@/schemas/applications'
+import { rateLimit } from '@/middleware/rateLimit'
+import prisma from '@/db/prisma'
+import { convertType } from '@/lib/utils'
+
 
 const applicationsRoute = new Hono()
 
@@ -35,20 +37,41 @@ applicationsRoute.get('/', zValidator('query', z.object({
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error('Validation error:', error.errors)
-            return c.json({ success: false, error: 'Invalid data format' }, 400)
+            return c.json({ success: false, error: 'The internal applications schema didnt match the ApplicationSchema type. (Are you using incorrectly generated mock data?)' }, 400)
         }
         console.error('Error fetching applications:', error)
         return c.json({ success: false, error: 'Internal server error' }, 500)
     }
 })
 
-async function fetchApplications(limit: number, offset: number) {
-    console.log(`Simulating database query for applications (limit: ${limit}, offset: ${offset})`)
-    await new Promise(resolve => setTimeout(resolve, 100))
-    return mockApplications.slice(offset, offset + limit)
+async function fetchApplications(limit: number, offset: number): Promise<z.infer<typeof ApplicationSchema>[]> {
+    try {
+        const applications = await prisma.application.findMany({
+            take: limit,
+            skip: offset,
+            orderBy: {
+                closeDate: 'asc'
+            }
+        });
+
+        // Convert casing
+        const convertedApplications = applications.map(app => ({
+            ...app,
+            type: convertType(app.type),
+            requiresCv: app.requiresCv ?? false,
+            requiresCoverLetter: app.requiresCoverLetter ?? false,
+            requiresWrittenAnswers: app.requiresWrittenAnswers ?? false,
+            isSponsored: app.isSponsored ?? undefined,
+        }))
+
+
+        return convertedApplications
+    } catch (error) {
+        console.error('Error fetching applications from database:', error)
+        throw error
+    }
 }
 
 console.log('Applications route set up successfully')
-
 export default applicationsRoute
 

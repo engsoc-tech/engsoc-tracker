@@ -66,17 +66,24 @@ enum Role {
 enum ApplicationType {
     INTERNSHIP
     PLACEMENT
-    GRADUATE_SCHEME
+    GRADUATE
+}
+
+enum EngineeringType {
+    AEROSPACE
+    CHEMICAL
+    CIVIL
+    COMPUTING
+    ELECTRONIC
+    MECHANICAL
 }
 
 model Application {
     id                     String          @id @default(auto()) @map("_id") @db.ObjectId
-    externalId             String?         @unique
-    programme              String?
+    programme              String
     company                String
-    jobTitle               String
     type                   ApplicationType
-    engineering            String?
+    engineering            String
     openDate               DateTime?
     closeDate              DateTime?
     requiresCv             Boolean?
@@ -84,8 +91,11 @@ model Application {
     requiresWrittenAnswers Boolean?
     notes                  String?
     link                   String          @unique
-    scrapedFrom            String
     isSponsored            Boolean         @default(false)
-    createdAt              DateTime        @default(now())
-    updatedAt              DateTime        @default(now())
+}
+
+model AppConfig {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    lastUpdated DateTime
+    isUpdating  Boolean
 }
