@@ -1,20 +1,7 @@
 import { z } from 'zod';
+import { ApplicationSchema } from '../../prisma/generated/zod';
 
-export const ApplicationSchema = z.object({
-    id: z.string(),
-    programme: z.string(),
-    company: z.string(),
-    type: z.enum(['Internship', 'Placement', 'Graduate']),
-    engineering: z.string(),
-    // salary: z.string().nullable(),
-    openDate: z.date().nullable(),
-    closeDate: z.date().nullable(),
-    requiresCv: z.boolean().nullable(),
-    requiresCoverLetter: z.boolean().nullable(),
-    requiresWrittenAnswers: z.boolean(),
-    isSponsored: z.boolean(),
-    notes: z.string().nullable(),
-    link: z.string().url(),
-});
+export const ModifiedApplicationSchema = ApplicationSchema.omit({ id: true })
 
+export type ModifiedApplicationType = z.infer<typeof ModifiedApplicationSchema>;
 export type ApplicationType = z.infer<typeof ApplicationSchema>;

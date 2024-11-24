@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 
-import { ApplicationSchema } from '@/schemas/applications'
+import { ModifiedApplicationSchema } from '@/schemas/applications'
 import { rateLimit } from '@/middleware/rateLimit'
 import prisma from '@/db/prisma'
 import { convertType } from '@/lib/utils'
@@ -25,9 +25,9 @@ applicationsRoute.get('/', zValidator('query', z.object({
 
     try {
         const applications = await fetchApplications(limit, offset)
-        console.log(`Fetched ${applications.length} applications`)
+        console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
 
-        const validatedApplications = z.array(ApplicationSchema).parse(applications)
+        const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
         console.log('Applications data validated successfully')
 
         return c.json({
@@ -37,15 +37,17 @@ applicationsRoute.get('/', zValidator('query', z.object({
     } catch (error) {
         if (error instanceof z.ZodError) {
             console.error('Validation error:', error.errors)
-            return c.json({ success: false, error: 'The internal applications schema didnt match the ApplicationSchema type. (Are you using incorrectly generated mock data?)' }, 400)
+            return c.json({ success: false, error: 'The internal applications schema didnt match the ModifiedApplicationSchema type. (Are you using incorrectly generated mock data?)' }, 400)
         }
         console.error('Error fetching applications:', error)
         return c.json({ success: false, error: 'Internal server error' }, 500)
     }
 })
 
-async function fetchApplications(limit: number, offset: number): Promise<z.infer<typeof ApplicationSchema>[]> {
+async function fetchApplications(limit: number, offset: number): Promise<z.infer<typeof ModifiedApplicationSchema>[]> {
+    console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`);
     try {
+        console.log('Querying database...');
         const applications = await prisma.application.findMany({
             take: limit,
             skip: offset,
@@ -53,25 +55,34 @@ async function fetchApplications(limit: number, offset: number): Promise<z.infer
                 closeDate: 'asc'
             }
         });
+        console.log(`Retrieved ${applications.length} applications from database`);
+        console.log('Raw applications:');
+        console.dir(applications, { depth: null });
 
-        // Convert casing
-        const convertedApplications = applications.map(app => ({
-            ...app,
-            type: convertType(app.type),
-            requiresCv: app.requiresCv ?? false,
-            requiresCoverLetter: app.requiresCoverLetter ?? false,
-            requiresWrittenAnswers: app.requiresWrittenAnswers ?? false,
-            isSponsored: app.isSponsored ?? undefined,
-        }))
+        console.log('Converting application data...');
+        const convertedApplications = applications.map(app => {
+            console.log(`Converting application with ID: ${app.id}`);
+            const convertedApp = {
+                ...app,
+                type: convertType(app.type),
+                requiresCv: app.requiresCv ?? false,
+                requiresCoverLetter: app.requiresCoverLetter ?? false,
+                requiresWrittenAnswers: app.requiresWrittenAnswers ?? false,
+                isSponsored: app.isSponsored ?? undefined,
+            };
+            console.log('Converted application:');
+            console.dir(convertedApp, { depth: null });
+            return convertedApp;
+        });
 
-
-        return convertedApplications
+        console.log(`Conversion complete. Returning ${convertedApplications.length} applications`);
+        return convertedApplications;
     } catch (error) {
-        console.error('Error fetching applications from database:', error)
-        throw error
+        console.error('Error fetching applications from database:', error);
+        console.dir(error, { depth: null });
+        throw error;
     }
 }
-
 console.log('Applications route set up successfully')
 export default applicationsRoute
 

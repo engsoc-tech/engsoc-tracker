@@ -1,4 +1,4 @@
-import { ApplicationType } from "@/schemas/applications";
+import { ModifiedApplicationType } from "@/schemas/applications";
 import { clsx, type ClassValue } from "clsx"
 import { differenceInDays, format, parseISO } from "date-fns";
 import { twMerge } from "tailwind-merge"
@@ -20,7 +20,7 @@ export const formatDate = (date: string) => {
   }
 }
 
-export function convertType(type: string): ApplicationType['type'] {
+export function convertType(type: string): ModifiedApplicationType['type'] {
   switch (type.toUpperCase()) {
     case 'INTERNSHIP':
       return 'Internship'

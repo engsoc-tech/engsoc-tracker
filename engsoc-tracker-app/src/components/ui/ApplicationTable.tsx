@@ -72,6 +72,10 @@ export default function ApplicationTable({ }) {
     const engineeringTypes = ["all", ...new Set(applications.map(app => app.engineering))]
     const itemsPerPage = 5
     useEffect(() => {
+        //begins the periodic scrape job if it's not already running 
+        fetch('/api/cron');
+    }, []);
+    useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetch('/api/applications?_limit=10&_offset=0')

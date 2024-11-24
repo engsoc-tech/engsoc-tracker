@@ -1,11 +1,12 @@
 import * as cheerio from 'cheerio';
 import prisma from "@/db/prisma";
 import { env } from '@/env';
-import { ApplicationSchema, ApplicationType } from '@/schemas/applications';
+import { ApplicationType, ModifiedApplicationSchema, ModifiedApplicationType } from '@/schemas/applications';
 import { fetchHTMLTextWithProxy } from './fetch-html-text';
 import { engineeringTypes, EngineeringURLtype } from './map';
 import { z } from 'zod';
-import { EngineeringTypeSchema } from '../../prisma/generated/zod';
+import { ApplicationSchema, EngineeringTypeSchema } from '../../prisma/generated/zod';
+import { EngineeringType } from '@prisma/client';
 interface Details {
   salary?: string;
   location?: string;
@@ -66,17 +67,38 @@ export async function scrapeGradcracker(type: EngineeringURLtype = 'all-discipli
       console.log(`Processing job listing ${index + 1}`)
       const $element = $(element)
 
+      let company = ''
+      const altText = $element.find('img').attr('alt');
+      console.log(`Alt text: ${altText}`)
+      if (!altText) {
+        company = '-';
+        console.log("No alt text found, setting company to '-'")
+      } else {
+        company = altText.trim()
+      }
+      console.log(`Job company: ${company}`)
+
       const title = $element.find('a.tw-block.tw-text-base.tw-font-semibold').text().trim()
       console.log(`Job title: ${title}`)
-
-      const company = $element.find('.tw-flex.tw-flex-col.tw-justify-center.tw-flex-1.tw-text-xs.tw-font-semibold').text().trim()
-      console.log(`Company: ${company}`)
 
       const link = $element.find('a.tw-block.tw-text-base.tw-font-semibold').attr('href')
       console.log(`Job link: ${link}`)
 
-      const engineering = $element.find('.tw-text-xs.tw-font-bold.tw-text-gray-800').text().trim()
-      console.log(`Engineering discipline: ${engineering}`)
+
+      const engineeringText = $element.find('.tw-text-xs.tw-font-bold.tw-text-gray-800').text().trim();
+      const engineeringTypes = engineeringText.split(',').map(type => {
+        const trimmedType = type.trim();
+        if (trimmedType.includes('Aerospace')) return "AEROSPACE";
+        if (trimmedType.includes('Chemical')) return "CHEMICAL";
+        if (trimmedType.includes('Civil')) return "CIVIL";
+        if (trimmedType.includes('Computing') || trimmedType.includes('Software')) return "COMPUTING";
+        if (trimmedType.includes('Electronic') || trimmedType.includes('Electrical')) return "ELECTRONIC";
+        if (trimmedType.includes('Mechanical')) return "MECHANICAL";
+        return null;
+      }).filter((type): type is EngineeringType => type !== null);
+
+      const engineering: EngineeringType[] = engineeringTypes.map(type => EngineeringTypeSchema.parse(type));
+      console.log(`Engineering disciplines: ${engineering}`);
 
       const details: Details = {}
       $element.find('ul li').each((_, li) => {
@@ -89,11 +111,11 @@ export async function scrapeGradcracker(type: EngineeringURLtype = 'all-discipli
 
       let jobType: ApplicationType['type']
       if (title.toLowerCase().includes('internship')) {
-        jobType = 'Internship'
+        jobType = 'INTERNSHIP'
       } else if (title.toLowerCase().includes('placement')) {
-        jobType = 'Placement'
+        jobType = 'PLACEMENT'
       } else {
-        jobType = 'Graduate'
+        jobType = 'GRADUATE'
       }
       console.log(`Job type determined: ${jobType}`)
 
@@ -102,8 +124,8 @@ export async function scrapeGradcracker(type: EngineeringURLtype = 'all-discipli
       const closeDate = details.deadline ? parseDate(details.deadline) : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
       console.log(`Open date: ${openDate}, Close date: ${closeDate}`)
 
-      const application: ApplicationType = {
-        id: `${company}-${title}`.replace(/\s+/g, '-').toLowerCase(),
+      const application: ModifiedApplicationType = {
+        // id: `${company}-${title}`.replace(/\s+/g, '-').toLowerCase(),
         programme: title,
         company,
         type: jobType,
@@ -121,7 +143,7 @@ export async function scrapeGradcracker(type: EngineeringURLtype = 'all-discipli
       console.log('Application object created:', application)
 
       try {
-        ApplicationSchema.parse(application)
+        ModifiedApplicationSchema.parse(application)
         console.log('Application validated successfully')
         return application
       } catch (error) {
