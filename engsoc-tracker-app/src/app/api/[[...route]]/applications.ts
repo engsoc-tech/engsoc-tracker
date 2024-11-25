@@ -7,6 +7,7 @@ import { ModifiedApplicationSchema } from '@/schemas/applications'
 import { rateLimit } from '@/middleware/rateLimit'
 import prisma from '@/db/prisma'
 import { convertType } from '@/lib/utils'
+import { getApplications } from '@/core/applications'
 
 
 const applicationsRoute = new Hono()
@@ -24,9 +25,9 @@ applicationsRoute.get('/', zValidator('query', z.object({
     console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
 
     try {
-        const applications = await fetchApplications(limit, offset)
+        const _applications = await fetchApplicationsFromDB(limit, offset)
+        const applications = _applications.map(app => ({ ...app, type: app.type.toUpperCase() }))
         console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
-
         const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
         console.log('Applications data validated successfully')
 
@@ -44,17 +45,11 @@ applicationsRoute.get('/', zValidator('query', z.object({
     }
 })
 
-async function fetchApplications(limit: number, offset: number): Promise<z.infer<typeof ModifiedApplicationSchema>[]> {
-    console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`);
+async function fetchApplicationsFromDB(limit: number, offset: number): Promise<z.infer<typeof ModifiedApplicationSchema>[]> {
+    console.log(`Fetching applications from DB with limit: ${limit}, offset: ${offset}`);
     try {
         console.log('Querying database...');
-        const applications = await prisma.application.findMany({
-            take: limit,
-            skip: offset,
-            orderBy: {
-                closeDate: 'asc'
-            }
-        });
+        const applications = await getApplications(limit, offset);
         console.log(`Retrieved ${applications.length} applications from database`);
         console.log('Raw applications:');
         console.dir(applications, { depth: null });
@@ -64,7 +59,7 @@ async function fetchApplications(limit: number, offset: number): Promise<z.infer
             console.log(`Converting application with ID: ${app.id}`);
             const convertedApp = {
                 ...app,
-                type: convertType(app.type),
+                type: app.type,
                 requiresCv: app.requiresCv ?? false,
                 requiresCoverLetter: app.requiresCoverLetter ?? false,
                 requiresWrittenAnswers: app.requiresWrittenAnswers ?? false,

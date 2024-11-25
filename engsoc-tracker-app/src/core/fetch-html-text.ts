@@ -5,9 +5,8 @@ interface FetchOptions {
 
 const TEST_DATA_URL = "http://localhost:3000/api/testing/gradcracker";
 
-export async function fetchHTMLTextWithProxy({ fullURL }: FetchOptions): Promise<Response> {
-    console.log('Starting fetchHTMLTextWithProxy function');
-    console.log(`Input URL: ${fullURL}`);
+export async function fetchHtml({ fullURL }: FetchOptions): Promise<Response> {
+    console.log('Starting fetchHtml function');
 
     const isProduction = process.env.NODE_ENV === "production"
     console.log(`Environment: ${isProduction ? 'Production' : 'Development'}`);
@@ -29,7 +28,7 @@ export async function fetchHTMLTextWithProxy({ fullURL }: FetchOptions): Promise
                     throw new Error("TEST_DATA_URL is not defined");
                 }
                 url = TEST_DATA_URL; // For testing
-                console.log(`Test URL: ${url}`);
+                console.log(`Using test URL: ${url}`);
             }
 
             console.log(`Fetching from URL: ${url}`);

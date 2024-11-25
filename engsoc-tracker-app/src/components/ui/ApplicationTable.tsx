@@ -31,45 +31,22 @@ import {
     CommandList,
 } from "@/components/ui/command"
 import { mockApplications } from "@/lib/mock-data"
-interface Application {
-    id: string
-    programme: string
-    company: string
-    type: string
-    engineering: string
-    openDate: string
-    closeDate: string
-    requiresCv: boolean
-    requiresCoverLetter: boolean
-    requiresWrittenAnswers: boolean
-    notes?: string
-    link: string
-}
+import { ApplicationType } from "@/schemas/applications"
+import { EngineeringType } from "@prisma/client"
+import { EngineeringTypes, SelectableEngineeringType, SelectableEngineeringTypes } from "@/core/map"
+import { EngineeringTypeType } from "../../../prisma/generated/zod"
 
 
-const getDeadlineStatus = (closeDate: string) => {
-    const now = new Date('2024-11-17')
-    const deadline = parseISO(closeDate)
-    const daysUntilDeadline = differenceInDays(deadline, now)
-
-    if (daysUntilDeadline < 14) {
-        return "bg-red-500 text-white hover:bg-opacity-80 hover:bg-red-500 transition-colors"
-    } else if (daysUntilDeadline < 31) {
-        return "bg-orange-500 text-white hover:bg-opacity-80 hover:bg-orange-500 transition-colors"
-    } else {
-        return "bg-green-500 text-white hover:bg-opacity-80 hover:bg-green-500 transition-colors"
-    }
-}
 
 
 export default function ApplicationTable({ }) {
-    const [selectedType, setSelectedType] = useState("all")
+    const selectableTypes = [...EngineeringTypes, "all"];
+    const [selectedType, setSelectedType] = useState<SelectableEngineeringType>("all")
     const [currentPage, setCurrentPage] = useState(1)
-    const [applications, setApplications] = useState<Application[]>([])
+    const [applications, setApplications] = useState<ApplicationType[]>([])
     const [isLoading, setIsLoading] = useState(true)
-    const [selectedEngineering, setSelectedEngineering] = useState("all")
+    const [selectedEngineering, setSelectedEngineering] = useState<SelectableEngineeringType>("all")
     const [searchDialogOpen, setSearchDialogOpen] = useState(false)
-    const engineeringTypes = ["all", ...new Set(applications.map(app => app.engineering))]
     const itemsPerPage = 5
     useEffect(() => {
         //begins the periodic scrape job if it's not already running 
@@ -93,24 +70,31 @@ export default function ApplicationTable({ }) {
 
         fetchData()
     }, [])
-
+    const formatCloseDate = (closeDate: string) => {
+        if (closeDate === '9999-12-31') {
+            return 'Ongoing'
+        }
+        return format(parseISO(closeDate), 'dd/MM/yyyy')
+    }
     const filteredApplications = useMemo(() => {
         //+ DO NOT RENDER APPLICATIONS THAT HAVE A CLOSED DATE BEFORE CLIENT NOW.
         return applications.filter(
             (app) =>
                 (selectedType === "all" || app.type.toLowerCase() === selectedType.toLowerCase()) &&
-                (selectedEngineering === "all" || app.engineering === selectedEngineering)
-                && parseISO(app.closeDate) > new Date()
+                (selectedEngineering === "all" || app.engineering.some((eng) => eng === selectedEngineering))
+                && app.closeDate > new Date()
         );
     }, [selectedType, selectedEngineering, applications]);
 
     const groupedApplications = filteredApplications.reduce((acc, app) => {
-        if (!acc[app.engineering]) {
-            acc[app.engineering] = []
-        }
-        acc[app.engineering].push(app)
+        app.engineering.forEach(eng => {
+            if (!acc[eng]) {
+                acc[eng] = []
+            }
+            acc[eng].push(app)
+        })
         return acc
-    }, {} as Record<string, Application[]>)
+    }, {} as Record<string, ApplicationType[]>)
 
     const totalPages = Math.ceil(Object.keys(groupedApplications).length / itemsPerPage)
 
@@ -120,6 +104,21 @@ export default function ApplicationTable({ }) {
             currentPage * itemsPerPage
         )
     )
+
+    const getDeadlineStatus = (closeDate: string) => {
+        const now = new Date('2024-11-17')
+        const deadline = parseISO(closeDate)
+        const daysUntilDeadline = differenceInDays(deadline, now)
+
+        if (daysUntilDeadline < 14) {
+            return "bg-red-500 text-white hover:bg-opacity-80 hover:bg-red-500 transition-colors"
+        } else if (daysUntilDeadline < 31) {
+            return "bg-orange-500 text-white hover:bg-opacity-80 hover:bg-orange-500 transition-colors"
+        } else {
+            return "bg-green-500 text-white hover:bg-opacity-80 hover:bg-green-500 transition-colors"
+        }
+    }
+
     const renderSkeletonRow = () => (
         <TableRow>
             <TableCell><Skeleton className="h-4 w-full" /></TableCell>
@@ -169,7 +168,7 @@ export default function ApplicationTable({ }) {
                     ))
                 ) : (
                     Object.entries(paginatedApplications).map(([engineering, apps]) => (
-                        <React.Fragment key={engineering}>
+                        <React.Fragment key={engineering + apps.toString()}>
                             <TableRow>
                                 <TableCell colSpan={9} className="bg-black/80 text-white font-bold">
                                     {engineering} Engineering
@@ -183,7 +182,7 @@ export default function ApplicationTable({ }) {
                                         format(new Date(app.openDate), 'dd/MM/yyyy')
                                     }</TableCell>
                                     <TableCell>
-                                        <Badge className={`${getDeadlineStatus(app.closeDate)} cursor-pointer`}>
+                                        <Badge className={`${getDeadlineStatus(app.closeDate.toISOString())} cursor-pointer`}>
                                             {formatDate(app.closeDate)}
                                         </Badge>
                                     </TableCell>
@@ -228,7 +227,7 @@ export default function ApplicationTable({ }) {
     return (
         <div className="flex flex-col justify-between h-full" >
 
-            <Tabs defaultValue="all" className="p-4 h-full" onValueChange={setSelectedType}>
+            <Tabs defaultValue="all" className="p-4 h-full" onValueChange={newVal => { setSelectedType(newVal as SelectableEngineeringType) }}>
 
                 <div className="flex flex-col items-center md:flex-row gap-4 mx-4 mb-6">
 
@@ -252,12 +251,12 @@ export default function ApplicationTable({ }) {
                                     <CommandInput placeholder="Filter by type..." />
                                     <CommandEmpty>No engineering type found.</CommandEmpty>
                                     <CommandGroup>
-                                        {engineeringTypes.map((type) => (
+                                        {SelectableEngineeringTypes.map((type) => (
                                             <CommandItem
-                                                key={type}
+                                                key={type[0]}
                                                 value={type}
                                                 onSelect={(currentValue) => {
-                                                    setSelectedEngineering(currentValue === selectedEngineering ? "all" : currentValue)
+                                                    setSelectedEngineering((currentValue) === selectedEngineering ? "all" : currentValue as SelectableEngineeringType)
                                                     setCurrentPage(1)
                                                     setSearchDialogOpen(false)
                                                 }}

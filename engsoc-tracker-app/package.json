@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cron:local": "ts-node src/scripts/run-cron-local.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.1",

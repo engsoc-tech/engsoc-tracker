@@ -7,20 +7,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatDate = (date: string) => {
-  const today = new Date();
+export const formatDate = (date: Date | string) => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
 
-  const parsedDate = parseISO(date)
-  const daysFromNow = differenceInDays(parsedDate, today)
+  if (date.getFullYear() === 9999) {
+    return 'Ongoing'
+  }
+
+  const today = new Date();
+  const daysFromNow = differenceInDays(date, today)
 
   if (daysFromNow <= 30) {
     return `in ${daysFromNow} days`
   } else {
-    return format(parsedDate, 'dd/MM/yyyy')
+    return format(date, 'dd/MM/yyyy')
   }
 }
 
-export function convertType(type: string): ModifiedApplicationType['type'] {
+export function convertType(type: string) {
   switch (type.toUpperCase()) {
     case 'INTERNSHIP':
       return 'Internship'
@@ -32,3 +38,4 @@ export function convertType(type: string): ModifiedApplicationType['type'] {
       throw new Error(`Invalid application type: ${type}`)
   }
 }
+

@@ -1,8 +1,8 @@
 
 'use server'
-import prisma from '@/db/prisma';
-import { ApplicationType, ModifiedApplicationType } from '@/schemas/applications';
-import { engineeringTypes, EngineeringURLtype } from './map';
+import prisma from '../db/prisma';
+import { ApplicationType, ModifiedApplicationType } from '../schemas/applications';
+import { EngineeringURLtype } from './map';
 import { scrapeGradcracker } from './gradcracker';
 import { z } from 'zod';
 import { ApplicationSchema } from '../../prisma/generated/zod';
@@ -41,23 +41,7 @@ export async function scrapeAllSources(): Promise<ApplicationType[]> {
 
         let allApplications: ApplicationType[] = []
 
-        for (const [type, typeName] of engineeringTypes) {
-            console.log(`Starting scrape for ${typeName}...`)
-            const applications = await scrapeGradcracker(
-                type as EngineeringURLtype
-            )
-
-            // console.log(`Finished scraping ${typeName}. Found ${applications.length} applications.`)
-            allApplications = [...allApplications, ...applications]
-
-            console.log("AllApplications: " + allApplications)
-        }
-        // if (type !== 'mechanical-engineering') {  // Don't delay after the last type
-        //     console.log(`Waiting for 5 minutes before scraping next type...`)
-        //     await new Promise(resolve => setTimeout(resolve, SCRAPE_GRADCRACKER_INTERVAL))
-        //     console.log('5-minute wait completed.')
-        // }
-        // }
+        allApplications = [...await scrapeGradcracker()];
 
         console.log(`Scraping completed. Total applications scraped: ${allApplications.length}`)
 
@@ -87,19 +71,39 @@ export async function scrapeAllSources(): Promise<ApplicationType[]> {
 }
 
 
-export async function updateDatabase(applications: ModifiedApplicationType[]): Promise<void> {
+export async function updateDatabase(applications: ApplicationType[]): Promise<void> {
     console.log('Updating database with scraped applications...')
 
     try {
         for (const app of applications) {
-            console.log("Upserting application:" + app.programme)
-            console.dir(app, { depth: null })
-            const ap = await prisma.application.create({
-                // where: { id: app.id },
-                data: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
-                // create: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
+            const newApp = await prisma.$transaction(async (tx) => {
+                console.log("Upserting application, with an ID if " + app.id)
+                //check if app exists
+                // const existingAp = await tx.application.findUnique({
+                //     where: { id: app.id },
+                // })
+                return {
+                    id: 'dssgsgsgsd'
+                }
+                // console.log("Existing application: " + existingAp)
+                // if (existingAp) {
+                //     return await tx.application.update({
+                //         where: { id: app.id },
+                //         data: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
+                //     })
+                // } else {
+                //     return await tx.application.create({
+                //         data: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
+                //     })
+                // }
+                //NOT WORKING FOR SOME REASON
+                // const ap = await prisma.application.upsert({
+                //     where: { id: app.id },
+                //     create: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
+                //     update: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) }
+                // })
             })
-            console.log(`Created application: ${ap.id}`)
+            console.log(`Created application: ${newApp.id}`)
         }
         console.log('Database updated successfully')
     } catch (error) {
@@ -148,7 +152,7 @@ export async function runScrapeJob(): Promise<void> {
         if (error instanceof Error) {
             console.error('Error name:', error.name)
             console.error('Error message:', error.message)
-            console.error('Error stack:', error.stack)
+            // console.error('Error stack:', error.stack)
         }
     }
 }

@@ -79,13 +79,13 @@ enum EngineeringType {
 }
 
 model Application {
-    id                     String                  @id @default(auto()) @map("_id") @db.ObjectId
+    id                     String                  @id @map("_id")
     programme              String
     company                String
     type                   ModifiedApplicationType
     engineering            EngineeringType[]
-    openDate               DateTime?
-    closeDate              DateTime?
+    openDate               DateTime
+    closeDate              DateTime
     requiresCv             Boolean?
     requiresCoverLetter    Boolean?
     requiresWrittenAnswers Boolean?
