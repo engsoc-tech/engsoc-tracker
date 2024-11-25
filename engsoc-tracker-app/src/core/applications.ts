@@ -11,10 +11,7 @@ export async function getApplications(limit: number, offset: number): Promise<Ap
         }
     })
 
-    return applications.map(app => ({
-        ...app,
-        type: app.type.toUpperCase() as ApplicationType['type']
-    }))
+    return applications
 }
 
 export async function addApplication(application: Omit<ApplicationType, 'id'>): Promise<ApplicationType> {
@@ -22,10 +19,7 @@ export async function addApplication(application: Omit<ApplicationType, 'id'>): 
         data: application
     })
 
-    return {
-        ...newApplication,
-        type: newApplication.type.toUpperCase() as ApplicationType['type']
-    }
+    return newApplication
 }
 
 export async function updateApplication(id: string, application: Partial<ApplicationType>): Promise<ApplicationType> {
@@ -34,10 +28,7 @@ export async function updateApplication(id: string, application: Partial<Applica
         data: application
     })
 
-    return {
-        ...updatedApplication,
-        type: updatedApplication.type.toUpperCase() as ApplicationType['type']
-    }
+    return updatedApplication
 }
 
 export async function deleteApplication(id: string): Promise<void> {

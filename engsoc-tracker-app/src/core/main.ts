@@ -1,7 +1,7 @@
 
 'use server'
 import prisma from '../db/prisma';
-import { ApplicationType, ModifiedApplicationType } from '../schemas/applications';
+import { ApplicationType, PositionType } from '../schemas/applications';
 import { EngineeringURLtype } from './map';
 import { scrapeGradcracker } from './gradcracker';
 import { z } from 'zod';
@@ -77,31 +77,44 @@ export async function updateDatabase(applications: ApplicationType[]): Promise<v
     try {
         for (const app of applications) {
             const newApp = await prisma.$transaction(async (tx) => {
-                console.log("Upserting application, with an ID if " + app.id)
-                //check if app exists
-                // const existingAp = await tx.application.findUnique({
-                //     where: { id: app.id },
-                // })
-                return {
-                    id: 'dssgsgsgsd'
+                console.log(`Starting transaction for application: ${app.id}`)
+
+                // Check if the application already exists in the database
+                console.log(`Checking for existing application with id: ${app.id}`)
+                const existingAp = await tx.application.findUnique({
+                    where: { id: app.id },
+                })
+
+                console.log(`Existing application found: ${existingAp ? 'Yes' : 'No'}`)
+                if (existingAp) {
+                    console.log(`Updating existing application: ${app.id}`)
+                    console.log('Update data:', JSON.stringify(app, null, 2))
+
+
+
+                    //PAYLOAD MUST BE OF TYPE OBJECT RECEIVED NULL i stg
+                    return await tx.application.update({
+                        where: { id: app.id },
+                        data: app,
+                    })
+                    // (If the application exists, update it)
+                } else {
+                    console.log(`Creating new application: ${app.id}`)
+                    console.log('Create data:', JSON.stringify(app, null, 2))
+
+                    // If the application doesn't exist, create a new one
+                    return await tx.application.create({
+                        data: app,
+                    })
                 }
-                // console.log("Existing application: " + existingAp)
-                // if (existingAp) {
-                //     return await tx.application.update({
-                //         where: { id: app.id },
-                //         data: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
-                //     })
-                // } else {
-                //     return await tx.application.create({
-                //         data: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
-                //     })
-                // }
-                //NOT WORKING FOR SOME REASON
+
+                // NOT WORKING FOR SOME REASON. USING MANUAL UPSERT INSTEAD
                 // const ap = await prisma.application.upsert({
-                //     where: { id: app.id },
-                //     create: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) },
-                //     update: { ...app, type: (app.type.toUpperCase() as ApplicationType['type']) }
+                //     where: { id: '507f1f77bcf86cd799439011' },
+                //     create: app,
+                //     update: app
                 // })
+                // return ap;
             })
             console.log(`Created application: ${newApp.id}`)
         }
@@ -142,9 +155,9 @@ export async function runScrapeJob(): Promise<void> {
         await updateDatabase(applications)
         console.log('Database update completed.')
 
-        console.log('Removing expired applications...')
-        await removeExpiredApplications()
-        console.log('Expired applications removed.')
+        // console.log('Removing expired applications...')
+        // await removeExpiredApplications()
+        // console.log('Expired applications removed.')
 
         console.log('Scrape job completed successfully.')
     } catch (error) {

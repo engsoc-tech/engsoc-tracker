@@ -25,7 +25,7 @@ export default function CardsCarousel() {
     useEffect(() => {
         if (emblaApi) {
             const intervalId = setInterval(() => {
-                console.log("Scrolling to next slide")
+                // console.log("Scrolling to next slide")
                 emblaApi.scrollNext()
             }, 10000)
 

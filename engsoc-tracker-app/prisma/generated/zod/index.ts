@@ -22,11 +22,11 @@ export const RoleSchema = z.enum(['MEMBER','ADMIN','SUPER']);
 
 export type RoleType = `${z.infer<typeof RoleSchema>}`
 
-export const ModifiedApplicationTypeSchema = z.enum(['INTERNSHIP','PLACEMENT','GRADUATE']);
+export const PositionTypeSchema = z.enum(['Internship','Placement','Graduate']);
 
-export type ModifiedApplicationTypeType = `${z.infer<typeof ModifiedApplicationTypeSchema>}`
+export type PositionTypeType = `${z.infer<typeof PositionTypeSchema>}`
 
-export const EngineeringTypeSchema = z.enum(['AEROSPACE','CHEMICAL','CIVIL','COMPUTING','ELECTRONIC','MECHANICAL']);
+export const EngineeringTypeSchema = z.enum(['Aerospace','Chemical','Civil','Computing','Electronic','Mechanical','Software']);
 
 export type EngineeringTypeType = `${z.infer<typeof EngineeringTypeSchema>}`
 
@@ -39,7 +39,7 @@ export type EngineeringTypeType = `${z.infer<typeof EngineeringTypeSchema>}`
 /////////////////////////////////////////
 
 export const ApplicationSchema = z.object({
-  type: ModifiedApplicationTypeSchema,
+  type: PositionTypeSchema,
   engineering: EngineeringTypeSchema.array(),
   id: z.string(),
   programme: z.string(),
@@ -124,7 +124,7 @@ export const ApplicationWhereInputSchema: z.ZodType<Prisma.ApplicationWhereInput
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   programme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  type: z.union([ z.lazy(() => EnumModifiedApplicationTypeFilterSchema),z.lazy(() => ModifiedApplicationTypeSchema) ]).optional(),
+  type: z.union([ z.lazy(() => EnumPositionTypeFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
   openDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   closeDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -162,7 +162,7 @@ export const ApplicationWhereUniqueInputSchema: z.ZodType<Prisma.ApplicationWher
   NOT: z.union([ z.lazy(() => ApplicationWhereInputSchema),z.lazy(() => ApplicationWhereInputSchema).array() ]).optional(),
   programme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  type: z.union([ z.lazy(() => EnumModifiedApplicationTypeFilterSchema),z.lazy(() => ModifiedApplicationTypeSchema) ]).optional(),
+  type: z.union([ z.lazy(() => EnumPositionTypeFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
   openDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   closeDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -200,7 +200,7 @@ export const ApplicationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.A
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   programme: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
-  type: z.union([ z.lazy(() => EnumModifiedApplicationTypeWithAggregatesFilterSchema),z.lazy(() => ModifiedApplicationTypeSchema) ]).optional(),
+  type: z.union([ z.lazy(() => EnumPositionTypeWithAggregatesFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
   openDate: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   closeDate: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
@@ -261,7 +261,7 @@ export const ApplicationCreateInputSchema: z.ZodType<Prisma.ApplicationCreateInp
   id: z.string(),
   programme: z.string(),
   company: z.string(),
-  type: z.lazy(() => ModifiedApplicationTypeSchema),
+  type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.coerce.date(),
   closeDate: z.coerce.date(),
@@ -277,7 +277,7 @@ export const ApplicationUncheckedCreateInputSchema: z.ZodType<Prisma.Application
   id: z.string(),
   programme: z.string(),
   company: z.string(),
-  type: z.lazy(() => ModifiedApplicationTypeSchema),
+  type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.coerce.date(),
   closeDate: z.coerce.date(),
@@ -292,7 +292,7 @@ export const ApplicationUncheckedCreateInputSchema: z.ZodType<Prisma.Application
 export const ApplicationUpdateInputSchema: z.ZodType<Prisma.ApplicationUpdateInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  type: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => EnumModifiedApplicationTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   closeDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -307,7 +307,7 @@ export const ApplicationUpdateInputSchema: z.ZodType<Prisma.ApplicationUpdateInp
 export const ApplicationUncheckedUpdateInputSchema: z.ZodType<Prisma.ApplicationUncheckedUpdateInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  type: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => EnumModifiedApplicationTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   closeDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -323,7 +323,7 @@ export const ApplicationCreateManyInputSchema: z.ZodType<Prisma.ApplicationCreat
   id: z.string(),
   programme: z.string(),
   company: z.string(),
-  type: z.lazy(() => ModifiedApplicationTypeSchema),
+  type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.coerce.date(),
   closeDate: z.coerce.date(),
@@ -338,7 +338,7 @@ export const ApplicationCreateManyInputSchema: z.ZodType<Prisma.ApplicationCreat
 export const ApplicationUpdateManyMutationInputSchema: z.ZodType<Prisma.ApplicationUpdateManyMutationInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  type: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => EnumModifiedApplicationTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   closeDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -353,7 +353,7 @@ export const ApplicationUpdateManyMutationInputSchema: z.ZodType<Prisma.Applicat
 export const ApplicationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ApplicationUncheckedUpdateManyInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  type: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => EnumModifiedApplicationTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
   openDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   closeDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -418,11 +418,11 @@ export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
   not: z.union([ z.string(),z.lazy(() => NestedStringFilterSchema) ]).optional(),
 }).strict();
 
-export const EnumModifiedApplicationTypeFilterSchema: z.ZodType<Prisma.EnumModifiedApplicationTypeFilter> = z.object({
-  equals: z.lazy(() => ModifiedApplicationTypeSchema).optional(),
-  in: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  notIn: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  not: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema) ]).optional(),
+export const EnumPositionTypeFilterSchema: z.ZodType<Prisma.EnumPositionTypeFilter> = z.object({
+  equals: z.lazy(() => PositionTypeSchema).optional(),
+  in: z.lazy(() => PositionTypeSchema).array().optional(),
+  notIn: z.lazy(() => PositionTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => NestedEnumPositionTypeFilterSchema) ]).optional(),
 }).strict();
 
 export const EnumEngineeringTypeNullableListFilterSchema: z.ZodType<Prisma.EnumEngineeringTypeNullableListFilter> = z.object({
@@ -535,14 +535,14 @@ export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggreg
   _max: z.lazy(() => NestedStringFilterSchema).optional()
 }).strict();
 
-export const EnumModifiedApplicationTypeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumModifiedApplicationTypeWithAggregatesFilter> = z.object({
-  equals: z.lazy(() => ModifiedApplicationTypeSchema).optional(),
-  in: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  notIn: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  not: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => NestedEnumModifiedApplicationTypeWithAggregatesFilterSchema) ]).optional(),
+export const EnumPositionTypeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumPositionTypeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => PositionTypeSchema).optional(),
+  in: z.lazy(() => PositionTypeSchema).array().optional(),
+  notIn: z.lazy(() => PositionTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => NestedEnumPositionTypeWithAggregatesFilterSchema) ]).optional(),
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
-  _min: z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema).optional(),
-  _max: z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema).optional()
+  _min: z.lazy(() => NestedEnumPositionTypeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumPositionTypeFilterSchema).optional()
 }).strict();
 
 export const DateTimeWithAggregatesFilterSchema: z.ZodType<Prisma.DateTimeWithAggregatesFilter> = z.object({
@@ -621,8 +621,8 @@ export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFiel
   set: z.string().optional()
 }).strict();
 
-export const EnumModifiedApplicationTypeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumModifiedApplicationTypeFieldUpdateOperationsInput> = z.object({
-  set: z.lazy(() => ModifiedApplicationTypeSchema).optional()
+export const EnumPositionTypeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumPositionTypeFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => PositionTypeSchema).optional()
 }).strict();
 
 export const ApplicationUpdateengineeringInputSchema: z.ZodType<Prisma.ApplicationUpdateengineeringInput> = z.object({
@@ -662,11 +662,11 @@ export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.
   not: z.union([ z.string(),z.lazy(() => NestedStringFilterSchema) ]).optional(),
 }).strict();
 
-export const NestedEnumModifiedApplicationTypeFilterSchema: z.ZodType<Prisma.NestedEnumModifiedApplicationTypeFilter> = z.object({
-  equals: z.lazy(() => ModifiedApplicationTypeSchema).optional(),
-  in: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  notIn: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  not: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema) ]).optional(),
+export const NestedEnumPositionTypeFilterSchema: z.ZodType<Prisma.NestedEnumPositionTypeFilter> = z.object({
+  equals: z.lazy(() => PositionTypeSchema).optional(),
+  in: z.lazy(() => PositionTypeSchema).array().optional(),
+  notIn: z.lazy(() => PositionTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => NestedEnumPositionTypeFilterSchema) ]).optional(),
 }).strict();
 
 export const NestedDateTimeFilterSchema: z.ZodType<Prisma.NestedDateTimeFilter> = z.object({
@@ -734,14 +734,14 @@ export const NestedIntFilterSchema: z.ZodType<Prisma.NestedIntFilter> = z.object
   not: z.union([ z.number(),z.lazy(() => NestedIntFilterSchema) ]).optional(),
 }).strict();
 
-export const NestedEnumModifiedApplicationTypeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumModifiedApplicationTypeWithAggregatesFilter> = z.object({
-  equals: z.lazy(() => ModifiedApplicationTypeSchema).optional(),
-  in: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  notIn: z.lazy(() => ModifiedApplicationTypeSchema).array().optional(),
-  not: z.union([ z.lazy(() => ModifiedApplicationTypeSchema),z.lazy(() => NestedEnumModifiedApplicationTypeWithAggregatesFilterSchema) ]).optional(),
+export const NestedEnumPositionTypeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumPositionTypeWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => PositionTypeSchema).optional(),
+  in: z.lazy(() => PositionTypeSchema).array().optional(),
+  notIn: z.lazy(() => PositionTypeSchema).array().optional(),
+  not: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => NestedEnumPositionTypeWithAggregatesFilterSchema) ]).optional(),
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
-  _min: z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema).optional(),
-  _max: z.lazy(() => NestedEnumModifiedApplicationTypeFilterSchema).optional()
+  _min: z.lazy(() => NestedEnumPositionTypeFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumPositionTypeFilterSchema).optional()
 }).strict();
 
 export const NestedDateTimeWithAggregatesFilterSchema: z.ZodType<Prisma.NestedDateTimeWithAggregatesFilter> = z.object({

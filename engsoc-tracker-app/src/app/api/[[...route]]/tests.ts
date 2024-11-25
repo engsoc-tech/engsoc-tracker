@@ -5,26 +5,25 @@ import { rateLimit } from '@/middleware/rateLimit'
 import { CardSchema } from '@/schemas/cards'
 import { mockCards } from '@/lib/mock-data'
 import { ModifiedApplicationSchema } from '@/schemas/applications'
-import { scrapeGradcracker } from '@/core/gradcracker'
+import { scrapeGradcracker, scrapeGradcrackerDiscipline } from '@/core/gradcracker'
 
 console.log('Initializing cards route')
 
 const testsRoute = new Hono()
 
 
-testsRoute.get('/', zValidator('query', z.object({
-    _limit: z.string().optional().default("10"),
-    _offset: z.string().optional().default("0")
+testsRoute.get('/gradcracker', zValidator('query', z.object({
+    discipline: z.string().optional(),
+
 })), async (c) => {
-    console.log('Received GET request for applications')
-    const { _limit, _offset } = c.req.valid('query')
-    const limit = parseInt(_limit)
-    const offset = parseInt(_offset)
-    console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
+    console.log('Received GET request for test route')
+    const { discipline,
+    } = c.req.valid('query')
+
 
     try {
-        const scraped = await scrapeGradcracker('aerospace')
-        console.log(`Fetched ${scraped.length} applications`)
+
+        const scraped = await scrapeGradcrackerDiscipline('aerospace')
         return c.json({
             success: true,
             data: scraped
@@ -34,7 +33,7 @@ testsRoute.get('/', zValidator('query', z.object({
             console.error('Validation error:', error.errors)
             return c.json({ success: false, error: 'The internal applications schema didnt match the ModifiedApplicationSchema type. (Are you using incorrectly generated mock data?)' }, 400)
         }
-        console.error('Error fetching applications:', error)
+        console.error('Error testing applications:', error)
         return c.json({ success: false, error: 'Internal server error' }, 500)
     }
 })

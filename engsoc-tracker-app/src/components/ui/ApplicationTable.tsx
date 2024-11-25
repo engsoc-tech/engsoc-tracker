@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from "react"
-import { formatDistanceToNowStrict, parseISO, format, differenceInDays } from 'date-fns'
+import { formatDistanceToNowStrict, parseISO, format, differenceInDays, isAfter } from 'date-fns'
 import { Check, X, ChevronLeft, ChevronRight, ChevronsUpDown } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import {
@@ -33,15 +33,16 @@ import {
 import { mockApplications } from "@/lib/mock-data"
 import { ApplicationType } from "@/schemas/applications"
 import { EngineeringType } from "@prisma/client"
-import { EngineeringTypes, SelectableEngineeringType, SelectableEngineeringTypes } from "@/core/map"
+import { EngineeringTypes, SelectableEngineeringType, SelectableEngineeringTypes, SelectablePositonType } from "@/core/map"
 import { EngineeringTypeType } from "../../../prisma/generated/zod"
+import { PositionType } from "../../schemas/applications"
 
 
 
 
 export default function ApplicationTable({ }) {
     const selectableTypes = [...EngineeringTypes, "all"];
-    const [selectedType, setSelectedType] = useState<SelectableEngineeringType>("all")
+    const [selectedType, setSelectedType] = useState<SelectablePositonType>("all")
     const [currentPage, setCurrentPage] = useState(1)
     const [applications, setApplications] = useState<ApplicationType[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -70,31 +71,42 @@ export default function ApplicationTable({ }) {
 
         fetchData()
     }, [])
-    const formatCloseDate = (closeDate: string) => {
-        if (closeDate === '9999-12-31') {
-            return 'Ongoing'
-        }
-        return format(parseISO(closeDate), 'dd/MM/yyyy')
-    }
     const filteredApplications = useMemo(() => {
-        //+ DO NOT RENDER APPLICATIONS THAT HAVE A CLOSED DATE BEFORE CLIENT NOW.
-        return applications.filter(
-            (app) =>
-                (selectedType === "all" || app.type.toLowerCase() === selectedType.toLowerCase()) &&
-                (selectedEngineering === "all" || app.engineering.some((eng) => eng === selectedEngineering))
-                && app.closeDate > new Date()
+        console.log('Recalculating filteredApplications')
+        console.log('Current filters:', { selectedType, selectedEngineering })
+        const filtered = applications.filter(
+            (app) => {
+                console.log("app type lowercase", app.type.toLowerCase(), "selected type lowercase", selectedType.toLowerCase())
+                const typeMatch = (selectedType === "all" || app.type.toLowerCase() === selectedType.toLowerCase())
+                const engineeringMatch = selectedEngineering === "all" || app.engineering.includes(selectedEngineering as EngineeringType)
+                const currentDate = new Date()
+                const dateValid = isAfter(app.closeDate, currentDate)
+                console.log("datevalid", dateValid)
+                console.log('Application filter results:', { app, typeMatch, dateValid })
+                return typeMatch && dateValid && engineeringMatch
+            }
         );
+        console.log('Filtered applications count:', filtered.length)
+        return filtered;
     }, [selectedType, selectedEngineering, applications]);
 
+
+    console.log('Starting to group applications')
     const groupedApplications = filteredApplications.reduce((acc, app) => {
+        console.log('Grouping application:', app)
         app.engineering.forEach(eng => {
-            if (!acc[eng]) {
-                acc[eng] = []
+            if (eng === selectedEngineering || selectedEngineering === "all") {
+                if (!acc[eng]) {
+                    console.log('Creating new group for engineering type:', eng)
+                    acc[eng] = []
+                }
+                acc[eng].push(app)
+                console.log('Added application to group:', eng)
             }
-            acc[eng].push(app)
         })
         return acc
     }, {} as Record<string, ApplicationType[]>)
+    console.log('Grouped applications result:', Object.keys(groupedApplications).map(key => `${key}: ${groupedApplications[key].length} items`))
 
     const totalPages = Math.ceil(Object.keys(groupedApplications).length / itemsPerPage)
 
@@ -182,7 +194,7 @@ export default function ApplicationTable({ }) {
                                         format(new Date(app.openDate), 'dd/MM/yyyy')
                                     }</TableCell>
                                     <TableCell>
-                                        <Badge className={`${getDeadlineStatus(app.closeDate.toISOString())} cursor-pointer`}>
+                                        <Badge className={`${getDeadlineStatus(app.closeDate instanceof Date ? app.closeDate.toISOString() : app.closeDate)} cursor-pointer`}>
                                             {formatDate(app.closeDate)}
                                         </Badge>
                                     </TableCell>
@@ -227,7 +239,7 @@ export default function ApplicationTable({ }) {
     return (
         <div className="flex flex-col justify-between h-full" >
 
-            <Tabs defaultValue="all" className="p-4 h-full" onValueChange={newVal => { setSelectedType(newVal as SelectableEngineeringType) }}>
+            <Tabs defaultValue="all" className="p-4 h-full" onValueChange={newVal => { setSelectedType(newVal as SelectablePositonType) }}>
 
                 <div className="flex flex-col items-center md:flex-row gap-4 mx-4 mb-6">
 
@@ -256,7 +268,7 @@ export default function ApplicationTable({ }) {
                                                 key={type[0]}
                                                 value={type}
                                                 onSelect={(currentValue) => {
-                                                    setSelectedEngineering((currentValue) === selectedEngineering ? "all" : currentValue as SelectableEngineeringType)
+                                                    setSelectedEngineering(currentValue === selectedEngineering ? "all" : currentValue as SelectableEngineeringType)
                                                     setCurrentPage(1)
                                                     setSearchDialogOpen(false)
                                                 }}
@@ -303,10 +315,14 @@ export default function ApplicationTable({ }) {
                 >
                     <ChevronLeft className="mr-2 h-4 w-4" /> Previous
                 </Button>
-                <span>Page {currentPage} of {totalPages}</span>
+                <span className="text-opacity-50">
+                    {Object.keys(groupedApplications).length === 0
+                        ? "No results for this type - try another filter!"
+                        : `Page ${currentPage} of ${totalPages}`}
+                </span>
                 <Button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage === totalPages || totalPages === 0}
                 >
                     Next <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>

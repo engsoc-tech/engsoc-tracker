@@ -63,26 +63,27 @@ enum Role {
 }
 
 //BUSINESS LOGIC
-enum ModifiedApplicationType {
-    INTERNSHIP
-    PLACEMENT
-    GRADUATE
+enum PositionType {
+    Internship
+    Placement
+    Graduate
 }
 
 enum EngineeringType {
-    AEROSPACE
-    CHEMICAL
-    CIVIL
-    COMPUTING
-    ELECTRONIC
-    MECHANICAL
+    Aerospace
+    Chemical
+    Civil
+    Computing
+    Electronic
+    Mechanical
+    Software
 }
 
 model Application {
-    id                     String                  @id @map("_id")
+    id                     String            @id @map("_id")
     programme              String
     company                String
-    type                   ModifiedApplicationType
+    type                   PositionType
     engineering            EngineeringType[]
     openDate               DateTime
     closeDate              DateTime
@@ -91,7 +92,7 @@ model Application {
     requiresWrittenAnswers Boolean?
     notes                  String?
     link                   String
-    isSponsored            Boolean                 @default(false)
+    isSponsored            Boolean           @default(false)
 }
 
 model AppConfig {

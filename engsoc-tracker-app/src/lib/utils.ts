@@ -1,4 +1,4 @@
-import { ModifiedApplicationType } from "@/schemas/applications";
+import { PositionType } from "@/schemas/applications";
 import { clsx, type ClassValue } from "clsx"
 import { differenceInDays, format, parseISO } from "date-fns";
 import { twMerge } from "tailwind-merge"
@@ -26,16 +26,4 @@ export const formatDate = (date: Date | string) => {
   }
 }
 
-export function convertType(type: string) {
-  switch (type.toUpperCase()) {
-    case 'INTERNSHIP':
-      return 'Internship'
-    case 'PLACEMENT':
-      return 'Placement'
-    case 'GRADUATE':
-      return 'Graduate'
-    default:
-      throw new Error(`Invalid application type: ${type}`)
-  }
-}
 

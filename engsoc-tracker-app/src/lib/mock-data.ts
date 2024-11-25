@@ -1,5 +1,5 @@
 import { addDays } from 'date-fns'
-import { ModifiedApplicationType } from '../schemas/applications'
+import { PositionType } from '../schemas/applications'
 import { CardProps } from '@/components/ui/interfaces'
 
 const today = new Date('2024-11-17')
@@ -31,7 +31,7 @@ export const mockCards: CardProps[] = [
     },
 ]
 
-export const mockApplications: ModifiedApplicationType[] = [
+export const mockApplications: PositionType[] = [
     {
         id: "1",
         programme: "Graduate Engineer",

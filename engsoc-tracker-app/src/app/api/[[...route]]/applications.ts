@@ -6,7 +6,6 @@ import { PrismaClient } from '@prisma/client'
 import { ModifiedApplicationSchema } from '@/schemas/applications'
 import { rateLimit } from '@/middleware/rateLimit'
 import prisma from '@/db/prisma'
-import { convertType } from '@/lib/utils'
 import { getApplications } from '@/core/applications'
 
 
@@ -25,8 +24,7 @@ applicationsRoute.get('/', zValidator('query', z.object({
     console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
 
     try {
-        const _applications = await fetchApplicationsFromDB(limit, offset)
-        const applications = _applications.map(app => ({ ...app, type: app.type.toUpperCase() }))
+        const applications = await fetchApplicationsFromDB(limit, offset)
         console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
         const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
         console.log('Applications data validated successfully')
