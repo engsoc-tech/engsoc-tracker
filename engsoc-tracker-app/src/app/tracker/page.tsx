@@ -12,7 +12,7 @@ import Faqs from "@/components/ui/faq"
 
 
 export default function TrackingPage() {
-
+  console.log("This verison is in showcase mode for standups. Check globals.css.")
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 ">

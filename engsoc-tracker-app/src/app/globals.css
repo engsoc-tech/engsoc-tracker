@@ -134,3 +134,8 @@ html, body {
     @apply bg-background text-foreground;
   }
 }
+/* 
+During showcase, disable errors: */
+nextjs-portal {
+  display: none;
+}
