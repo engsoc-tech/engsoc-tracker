@@ -7,6 +7,7 @@ import { ModifiedApplicationSchema } from '@/schemas/applications'
 import { rateLimit } from '@/middleware/rateLimit'
 import prisma from '@/db/prisma'
 import { getApplications } from '@/core/applications'
+import { mockApplications } from '@/lib/mock-data'
 
 
 const applicationsRoute = new Hono()
@@ -24,10 +25,14 @@ applicationsRoute.get('/', zValidator('query', z.object({
     console.log(`Fetching applications with limit: ${limit}, offset: ${offset}`)
 
     try {
-        const applications = await fetchApplicationsFromDB(limit, offset)
-        console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
-        const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
-        console.log('Applications data validated successfully')
+        // const applications = await fetchApplicationsFromDB(limit, offset)
+        // console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
+        // const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
+        // console.log('Applications data validated successfully')
+
+
+        //return mock data instead
+        const validatedApplications = z.array(ModifiedApplicationSchema).parse(mockApplications)
 
         return c.json({
             success: true,

@@ -118,11 +118,11 @@ export default function ApplicationTable({ }) {
     )
 
     const getDeadlineStatus = (closeDate: string) => {
-        const now = new Date('2024-11-17')
+        const now = new Date()
         const deadline = parseISO(closeDate)
         const daysUntilDeadline = differenceInDays(deadline, now)
-
-        if (daysUntilDeadline < 14) {
+        console.log("days until deadline", daysUntilDeadline)
+        if (daysUntilDeadline < 21) {
             return "bg-red-500 text-white hover:bg-opacity-80 hover:bg-red-500 transition-colors"
         } else if (daysUntilDeadline < 31) {
             return "bg-orange-500 text-white hover:bg-opacity-80 hover:bg-orange-500 transition-colors"
