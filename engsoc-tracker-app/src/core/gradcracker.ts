@@ -1,10 +1,12 @@
-import * as cheerio from 'cheerio';
-import { ApplicationType, ModifiedApplicationSchema, PositionType } from '../schemas/applications';
-import { fetchHtml } from './fetch-html-text';
-import { EngineeringTypes, EngineeringURLtype, PositionTypes, SelectableEngineeringTypes } from './map';
-import { z, ZodError } from 'zod';
+import { ApplicationType } from './../schemas/applications';
+import puppeteer from 'puppeteer';
+import { z } from 'zod';
+import { getURL } from './url-utilts';
 import { ApplicationSchema, EngineeringTypeSchema } from '../../prisma/generated/zod';
-import { EngineeringType } from '@prisma/client';
+import { EngineeringType, PositionType } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+
 interface Details {
   salary?: string;
   location?: string;
@@ -12,23 +14,21 @@ interface Details {
   deadline?: string;
   starting?: string;
 }
-function parseDate(dateString: string): Date {
+
+export function parseDate(dateString: string): Date {
   console.log(`Attempting to parse date: ${dateString}`);
 
-  // Check if the date is 'Ongoing'
   if (dateString === 'Ongoing') {
     console.log("Date is 'Ongoing'. Setting to far future date.");
-    return new Date('9999-12-31'); // Use a far future date for 'Ongoing'
+    return new Date('9999-12-31');
   }
 
-  // Try parsing the date string directly
   const parsedDate = new Date(dateString);
   if (!isNaN(parsedDate.getTime())) {
     console.log(`Successfully parsed date directly: ${parsedDate}`);
     return parsedDate;
   }
 
-  // Handle format like "November 29th, 2024"
   const match = dateString.match(/(\w+)\s(\d+)(?:st|nd|rd|th),\s(\d{4})/);
   if (match) {
     const [, month, day, year] = match;
@@ -38,12 +38,13 @@ function parseDate(dateString: string): Date {
     return formattedDate;
   }
 
-  // If all parsing attempts fail, log an error and return current date
   console.error(`Unable to parse date: ${dateString}. Falling back to current date.`);
   return new Date();
 }
+
 type GradCrackerDiscipline = 'all-disciplines' | 'aerospace' | 'chemical-process' | 'civil-building' | 'computing-technology' | 'electronic-electrical' | 'mechanical-engineering';
-export async function scrapeGradcracker(type: GradCrackerDiscipline = 'all-disciplines'): Promise<ApplicationType[]> {
+
+export async function scrapeGradcracker(type: GradCrackerDiscipline = 'all-disciplines', testHtmlPath?: string): Promise<ApplicationType[]> {
   console.log("Scrape Gradcracker discipline called with type:", type);
   try {
     const disciplinesToScrape: GradCrackerDiscipline[] = [
@@ -54,121 +55,134 @@ export async function scrapeGradcracker(type: GradCrackerDiscipline = 'all-disci
       // 'computing-technology',
       // 'electronic-electrical',
       // 'mechanical-engineering'
-    ]
+    ];
     let gradCrackerApps: ApplicationType[] = [];
     for (const discipline of disciplinesToScrape) {
-      gradCrackerApps = [...gradCrackerApps, ...await scrapeGradcrackerDiscipline(discipline)]
+      gradCrackerApps = [...gradCrackerApps, ...await scrapeGradcrackerDiscipline(discipline, testHtmlPath)];
     }
     return gradCrackerApps;
-
   } catch (error) {
-    return []
+    console.error('Error in scrapeGradcracker:', error);
+    return [];
   }
 }
 
-export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline) {
+async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline, testHtmlPath?: string): Promise<ApplicationType[]> {
   try {
+    console.log('Launching Puppeteer...');
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-    console.log('Fetching Gradcracker search page...')
-    const url = `https://www.gradcracker.com/search/${discipline}/engineering-jobs`
-    console.log(`Target URL: ${url}`)
-
-    const response = await fetchHtml({ fullURL: url })
-    console.log('Gradcracker page fetched successfully')
-
-    const data = await response.text()
-    console.log(`Received HTML content length: ${data.length} characters`)
-
-    const $: cheerio.Root = cheerio.load(data)
-    console.log('HTML content loaded into Cheerio')
-
-    console.log('Extracting job listings...')
-    const applications = $('.tw-relative.tw-mb-4.tw-border-2.tw-border-gray-200.tw-rounded').map((index, element) => {
-      console.log(`Processing job listing ${index + 1}`)
-      const $element = $(element)
-
-      let company = ''
-      const altText = $element.find('img').attr('alt');
-      console.log(`Alt text: ${altText}`)
-      if (!altText) {
-        company = '-';
-        console.log("No alt text found, setting company to '-'")
-      } else {
-        company = altText.trim()
-      }
-      console.log(`Job company: ${company}`)
-
-      const title = $element.find('a.tw-block.tw-text-base.tw-font-semibold').text().trim()
-      console.log(`Job title: ${title}`)
-
-      const link = $element.find('a.tw-block.tw-text-base.tw-font-semibold').attr('href')
-      console.log(`Job link: ${link}`)
-
-
-      const engineeringText = $element.find('.tw-text-xs.tw-font-bold.tw-text-gray-800').text().trim();
-      const _engType = engineeringText.split(',').map(type => {
-        const trimmedType = type.trim();
-        for (const eng in SelectableEngineeringTypes) {
-          if (trimmedType.includes(SelectableEngineeringTypes[eng])) return SelectableEngineeringTypes[eng];
-          if (trimmedType.includes('Electrical')) return "Electronic";
-        }
-        return null;
-      }).filter((type): type is EngineeringType => type !== null);
-      const engineering: EngineeringType[] = _engType.map(type => EngineeringTypeSchema.parse(type));
-      console.log(`Engineering disciplines: ${engineering}`);
-
-      const details: Details = {}
-      $element.find('ul li').each((_, li) => {
-        const text = $(li).text().trim()
-        const [key, value] = text.split(':').map(s => s.trim())
-        const camelCaseKey = key.toLowerCase().replace(/\s(.)/g, (_, char) => char.toUpperCase())
-        details[camelCaseKey as keyof Details] = value
-      })
-      console.log('Job details:', details)
-
-      let positionType: ApplicationType['type'];
-      positionType = 'Graduate';
-      for (const pt in PositionTypes) {
-        if (title.toLowerCase().includes(PositionTypes[pt])) positionType = PositionTypes[pt];
-      }
-      console.log(`Position type determined: ${positionType}`)
-
-      const now = new Date()
-      const openDate = now;
-      const closeDate = details.deadline ? parseDate(details.deadline) : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-      console.log(`Open date: ${openDate}, Close date: ${closeDate}`)
-
-      const application: ApplicationType = {
-        id: `${company}0${title}`.replace(/[\s-]+/g, '0').toLowerCase(),
-        programme: title,
-        company,
-        type: positionType,
-        engineering,
-        openDate,
-        closeDate,
-        requiresCv: true,
-        requiresCoverLetter: false,
-        requiresWrittenAnswers: false,
-        isSponsored: Math.random() < 0.5, // Randomly assign sponsored status
-        notes: "",
-        link: link || '',
-      }
-
-      console.log('Application object created:', application)
-
-      ApplicationSchema.parse(application)
-      console.log('Application validated successfully')
-      return application
-
-    }).get().filter(Boolean) as ApplicationType[]
-    return applications
-  } catch (error) {
-    if (error instanceof ZodError) {
-      console.error('Validation error:', error.errors)
-      return [];
+    if (testHtmlPath) {
+      console.log(`Using test HTML file: ${testHtmlPath}`);
+      const htmlContent = fs.readFileSync(path.resolve(testHtmlPath), 'utf-8');
+      await page.setContent(htmlContent);
+    } else {
+      console.log('Fetching Gradcracker search page...');
+      const originalURL = `https://www.gradcracker.com/search/${discipline}/engineering-jobs`;
+      const targetURL = getURL({ fullURL: originalURL, useProxy: process.env.NODE_ENV === 'production' });
+      console.log(`Target URL: ${targetURL}`);
+      await page.goto(targetURL as string, { waitUntil: 'networkidle0' });
     }
-    console.error('Error scraping Gradcracker:', error)
-    return []
-  }
+    console.log('Gradcracker page loaded successfully');
 
+    const applications: ApplicationType[] = [];
+
+    while (true) {
+      console.log('Extracting job listings...');
+      const pageApplications = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('.tw-relative.tw-mb-4.tw-border-2.tw-border-gray-200.tw-rounded')).map((element, index) => {
+          console.log(`Processing job listing ${index + 1}`);
+
+          const company = element.querySelector('img')?.alt?.trim() || '-';
+          console.log(`Job company: ${company}`);
+
+          const title = element.querySelector('a.tw-block.tw-text-base.tw-font-semibold')?.textContent?.trim() || '';
+          console.log(`Job title: ${title}`);
+
+          const link = element.querySelector('a.tw-block.tw-text-base.tw-font-semibold')?.getAttribute('href') || '';
+          console.log(`Job link: ${link}`);
+
+          const engineeringText = element.querySelector('.tw-text-xs.tw-font-bold.tw-text-gray-800')?.textContent?.trim() || '';
+          const engineering = engineeringText.split(',').map(type => type.trim());
+          console.log(`Engineering disciplines: ${engineering}`);
+
+          const details: Details = {};
+          element.querySelectorAll('ul li').forEach((li) => {
+            const text = li.textContent?.trim() || '';
+            const [key, value] = text.split(':').map(s => s.trim());
+            const camelCaseKey = key.toLowerCase().replace(/\s(.)/g, (_, char) => char.toUpperCase());
+            details[camelCaseKey as keyof Details] = value;
+          });
+          console.log('Job details:', details);
+
+          return {
+            id: `${company}0${title}`.replace(/[\s-]+/g, '0').toLowerCase(),
+            programme: title,
+            company,
+            type: 'Graduate' as PositionType,
+            engineering,
+            openDate: new Date().toISOString(),
+            closeDate: details.deadline,
+            requiresCv: true,
+            requiresCoverLetter: false,
+            requiresWrittenAnswers: false,
+            isSponsored: Math.random() < 0.5,
+            notes: "",
+            link,
+          };
+        });
+      });
+
+      for (const app of pageApplications) {
+        app.closeDate = app.closeDate ? parseDate(app.closeDate).toISOString() : new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        app.engineering = app.engineering.map(eng => {
+          if (eng.includes('Electrical')) return 'Electronic';
+          return eng as EngineeringType;
+        }).filter((eng): eng is EngineeringType => EngineeringTypeSchema.safeParse(eng).success);
+
+        try {
+          const validatedApp = ApplicationSchema.parse(app);
+          applications.push(validatedApp);
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            console.error('Validation error:', error.errors);
+          }
+        }
+      }
+
+      if (testHtmlPath) {
+        // If using a test HTML file, we don't need to paginate
+        break;
+      }
+
+      const nextButton = await page.$('a[rel="next"]');
+      if (nextButton) {
+        console.log('Moving to next page...');
+        await nextButton.click();
+        await page.waitForNavigation({ waitUntil: 'networkidle0' });
+      } else {
+        console.log('No more pages to scrape');
+        break;
+      }
+    }
+
+    await browser.close();
+    console.log(`Scraped ${applications.length} applications successfully`);
+    return applications;
+  } catch (error) {
+    console.error('Error scraping Gradcracker:', error);
+    return [];
+  }
 }
+
+// Usage example
+if (require.main === module) {
+  const testHtmlPath = process.argv[2]; // Get the test HTML file path from command line argument
+  scrapeGradcracker('all-disciplines', testHtmlPath).then(applications => {
+    console.log(JSON.stringify(applications, null, 2));
+  }).catch(error => {
+    console.error('An error occurred:', error);
+  });
+}
+
