@@ -12,7 +12,7 @@ interface Details {
   location?: string;
   engineering?: string;
   deadline?: string;
-  starting?: string;
+  starting?: string
 }
 
 export function parseDate(dateString: string): Date {
