@@ -44,7 +44,7 @@ export function parseDate(dateString: string): Date {
 
 type GradCrackerDiscipline = 'all-disciplines' | 'aerospace' | 'chemical-process' | 'civil-building' | 'computing-technology' | 'electronic-electrical' | 'mechanical-engineering';
 
-export async function scrapeGradcracker(type: GradCrackerDiscipline = 'all-disciplines', testHtmlPath?: string): Promise<ApplicationType[]> {
+export async function scrapeGradcracker(type: GradCrackerDiscipline | "" = 'all-disciplines', testHtmlPath?: string): Promise<ApplicationType[]> {
   console.log("Scrape Gradcracker discipline called with type:", type);
   try {
     const disciplinesToScrape: GradCrackerDiscipline[] = [
@@ -67,10 +67,11 @@ export async function scrapeGradcracker(type: GradCrackerDiscipline = 'all-disci
   }
 }
 
-async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline, testHtmlPath?: string): Promise<ApplicationType[]> {
+export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline | "", testHtmlPath?: string): Promise<ApplicationType[]> {
+  let browser;
   try {
     console.log('Launching Puppeteer...');
-    const browser = await puppeteer.launch();
+    browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     if (testHtmlPath) {
@@ -167,22 +168,15 @@ async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline, te
       }
     }
 
-    await browser.close();
     console.log(`Scraped ${applications.length} applications successfully`);
+    console.log('Applications:', applications);
     return applications;
   } catch (error) {
     console.error('Error scraping Gradcracker:', error);
     return [];
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
-
-// Usage example
-if (require.main === module) {
-  const testHtmlPath = process.argv[2]; // Get the test HTML file path from command line argument
-  scrapeGradcracker('all-disciplines', testHtmlPath).then(applications => {
-    console.log(JSON.stringify(applications, null, 2));
-  }).catch(error => {
-    console.error('An error occurred:', error);
-  });
-}
-

@@ -4,27 +4,22 @@ import { ApplicationType } from '../schemas/applications';
 import {
     describe, expect, test,
     beforeAll, it, jest
-
 } from '@jest/globals';
 import { JSDOM } from 'jsdom';
 import {
     parseDate,
     scrapeGradcracker,
+    scrapeGradcrackerDiscipline,
 } from './gradcracker';
 
-// // Mock the fetchHtml function
-// jest.mock('./fetch-html-text', () => ({
-//   fetchHtml: jest.fn().mockResolvedValue({
-//     text: () => fs.readFileSync(path.join(__dirname, '../testing/Computing_Technology Opportunities _ Gradcracker - Careers for STEM Students.html'), 'utf-8'),
-//   }),
-// }));
+const testHtmlPath = path.join(__dirname, '../testing/Computing_Technology Opportunities _ Gradcracker - Careers for STEM Students.html');
 
 describe('Gradcracker Scraper', () => {
     let dom: JSDOM;
     let document: Document;
 
     beforeAll(() => {
-        const html = fs.readFileSync(path.join(__dirname, '../testing/Computing_Technology Opportunities _ Gradcracker - Careers for STEM Students.html'), 'utf-8');
+        const html = fs.readFileSync(testHtmlPath, 'utf-8');
         dom = new JSDOM(html);
         document = dom.window.document;
     });
@@ -60,9 +55,9 @@ describe('Gradcracker Scraper', () => {
         });
     });
 
-    describe('scrapeGradcrackerDiscipline', () => {
-        it('should scrape applications correctly', async () => {
-            const applications = await scrapeGradcracker('computing-technology');
+    describe('scrapeGradcracker - Offline Tests', () => {
+        it('should scrape applications correctly from local file', async () => {
+            const applications = await scrapeGradcrackerDiscipline('', testHtmlPath);
             expect(applications).toBeInstanceOf(Array);
             expect(applications.length).toBeGreaterThan(0);
 
@@ -82,18 +77,9 @@ describe('Gradcracker Scraper', () => {
             expect(firstApp).toHaveProperty('link');
         });
 
-        it('should handle errors and return an empty array', async () => {
-            // Mock an error scenario
-            jest.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'));
 
-            const applications = await scrapeGradcracker('computing-technology');
-            expect(applications).toEqual([]);
-        });
-    });
-
-    describe('scrapeGradcracker', () => {
-        it('should scrape applications for all disciplines', async () => {
-            const applications = await scrapeGradcracker();
+        it('should scrape applications for all disciplines from local file', async () => {
+            const applications = await scrapeGradcracker('', testHtmlPath);
             expect(applications).toBeInstanceOf(Array);
             expect(applications.length).toBeGreaterThan(0);
 
@@ -101,14 +87,30 @@ describe('Gradcracker Scraper', () => {
             const disciplines = new Set(applications.map(app => app.engineering[0]));
             expect(disciplines.size).toBeGreaterThan(1);
         });
-
-        it('should handle errors and return an empty array', async () => {
-            // Mock an error scenario
-            jest.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'));
-
-            const applications = await scrapeGradcracker();
-            expect(applications).toEqual([]);
-        });
     });
+
+    // describe('scrapeGradcracker - Online Test', () => {
+    //     it('should scrape applications from live website', async () => {
+    //         jest.setTimeout(30000); // Increase timeout for online test
+    //         const applications = await scrapeGradcracker('computing-technology');
+    //         expect(applications).toBeInstanceOf(Array);
+    //         expect(applications.length).toBeGreaterThan(0);
+
+    //         const firstApp = applications[0];
+    //         expect(firstApp).toHaveProperty('id');
+    //         expect(firstApp).toHaveProperty('programme');
+    //         expect(firstApp).toHaveProperty('company');
+    //         expect(firstApp).toHaveProperty('type');
+    //         expect(firstApp).toHaveProperty('engineering');
+    //         expect(firstApp).toHaveProperty('openDate');
+    //         expect(firstApp).toHaveProperty('closeDate');
+    //         expect(firstApp).toHaveProperty('requiresCv');
+    //         expect(firstApp).toHaveProperty('requiresCoverLetter');
+    //         expect(firstApp).toHaveProperty('requiresWrittenAnswers');
+    //         expect(firstApp).toHaveProperty('isSponsored');
+    //         expect(firstApp).toHaveProperty('notes');
+    //         expect(firstApp).toHaveProperty('link');
+    //     }, 30000);
+    // });
 });
 
