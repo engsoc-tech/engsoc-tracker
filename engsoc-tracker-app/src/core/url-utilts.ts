@@ -11,7 +11,8 @@ export function getURL({ fullURL, useProxy }: URLOptions): string | Buffer {
     if (useProxy) {
         console.log('Using proxy');
         try {
-            const proxyUrl = useProxyURL(fullURL);
+            // const proxyUrl = useProxyURL(fullURL);
+            const proxyUrl = fullURL
             console.log(`Proxy URL: ${proxyUrl}`);
             return proxyUrl;
         } catch (error) {

@@ -19,7 +19,8 @@ export async function fetchHtml({ fullURL }: FetchOptions): Promise<Response> {
         try {
             if (isProduction) {
                 console.log('Using proxy in production environment');
-                url = useProxy(fullURL);
+                // url = useProxy(fullURL);
+                url = fullURL
                 console.log(`Proxy URL: ${url}`);
             } else {
                 console.log('Using test URL in development environment');

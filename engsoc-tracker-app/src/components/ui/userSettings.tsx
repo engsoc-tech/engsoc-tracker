@@ -30,7 +30,7 @@ export default function SettingsModal() {
                 <DialogHeader>
                     <DialogTitle>User Settings</DialogTitle>
                     <DialogDescription>
-                        Adjust your profile settings here. Click save when you're done.
+                        Adjust your profile settings here. Click save when you&apos;re done.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
