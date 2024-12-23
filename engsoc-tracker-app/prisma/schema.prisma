@@ -80,7 +80,7 @@ enum EngineeringType {
 }
 
 model Application {
-    id                     String            @id @map("_id")
+    id                     String            @id @default(auto()) @map("_id") @db.ObjectId
     programme              String
     company                String
     type                   PositionType

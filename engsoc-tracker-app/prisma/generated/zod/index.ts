@@ -258,7 +258,7 @@ export const AppConfigScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.App
 }).strict();
 
 export const ApplicationCreateInputSchema: z.ZodType<Prisma.ApplicationCreateInput> = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   programme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
@@ -274,7 +274,7 @@ export const ApplicationCreateInputSchema: z.ZodType<Prisma.ApplicationCreateInp
 }).strict();
 
 export const ApplicationUncheckedCreateInputSchema: z.ZodType<Prisma.ApplicationUncheckedCreateInput> = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   programme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
@@ -320,7 +320,7 @@ export const ApplicationUncheckedUpdateInputSchema: z.ZodType<Prisma.Application
 }).strict();
 
 export const ApplicationCreateManyInputSchema: z.ZodType<Prisma.ApplicationCreateManyInput> = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   programme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
