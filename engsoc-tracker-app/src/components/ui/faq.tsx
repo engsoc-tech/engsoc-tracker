@@ -5,13 +5,13 @@ type Props = {}
 const developers: Developer[] = [
     {
         name: "Tye Goulder",
-        link: "https://media.licdn.com/dms/image/v2/D4E03AQFGV_qKseoGkw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729184073149?e=1737590400&v=beta&t=yELowMAMCezNDfqnfDJFWbXNxbN9bLyTuv7A5WQeGsg",
+        link: "tye.jpg",
         linkedinUrl: "https://www.linkedin.com/in/tye-goulder/",
         websiteUrl: "https://www.tyegoulder.com/",
         roleInProject: "Lead Developer",
         roleInEngSoc: "Tech Representitive"
     },
-    { name: "Ege Cavus", roleInProject: 'Project Supervisor', roleInEngSoc: 'Technology Officer', link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" }
+    // { name: "Ege Cavus", roleInProject: 'Project Supervisor', roleInEngSoc: 'Technology Officer', link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" }
 ];
 type Developer = {
     name: string;
@@ -28,11 +28,11 @@ const societyMembers = [
     { name: "Mihir Annapureddy", link: "https://media.licdn.com/dms/image/v2/C4E03AQEvn5Reid0BOA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1667924463348?e=1737590400&v=beta&t=Q5nyPbnZBjv_iepQ1vqssEXWExqKL3ZzlTfDopNU7mE" },
     { name: "Karam Sandhar", link: "https://media.licdn.com/dms/image/v2/D4E03AQG9L7V5dyBSnw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1710706199013?e=1737590400&v=beta&t=xqPEhnHgboEt45ZkqMUmMdS_saLdgplNVUgfWCT3m9o" },
     { name: "Ege Cavus", link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" },
-    { name: "Tye Goulder", link: "https://media.licdn.com/dms/image/v2/D4E03AQFGV_qKseoGkw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729184073149?e=1737590400&v=beta&t=yELowMAMCezNDfqnfDJFWbXNxbN9bLyTuv7A5WQeGsg" },
+    { name: "Tye Goulder", link: "tye.jpg" },
 ]
 const accordionContent = [
     {
-        title: "What is the Warwick Engineering Society?",
+        title: "About the Engineering Society",
         content: (
             <>
                 <div className="mt-4">
@@ -47,7 +47,7 @@ const accordionContent = [
                     </div>
                 </div>
                 <div className="mt-4" >
-                    <h4 className="text-lg font-semibold text-gray-100 mb-4 mt-2" >Tracker developed by:</h4>
+                    <h4 className="text-lg font-semibold text-gray-100 mb-4 mt-2" >Tracker developed by</h4>
                     <DeveloperProfilePictures developers={developers} />
                 </div>
             </>
@@ -57,7 +57,7 @@ const accordionContent = [
 function Faqs({ }: Props) {
     return (
         <div className="bg-neutral-900/90 p-4 rounded-xl w-full">
-            <Accordion defaultValue='item-1' type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
+            <Accordion type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
                 {accordionContent.map((item, index) => (
                     <AccordionItem
                         key={index}

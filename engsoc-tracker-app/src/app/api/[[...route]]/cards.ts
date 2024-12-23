@@ -1,9 +1,10 @@
+import { mockCards } from '@/lib/mock-data';
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { rateLimit } from '@/middleware/rateLimit'
 import { CardSchema } from '@/schemas/cards'
-import { mockCards } from '@/lib/mock-data'
+import { } from '@/lib/mock-data'
 
 console.log('Initializing cards route')
 

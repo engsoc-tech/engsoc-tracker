@@ -23,8 +23,8 @@ function GoToTrackerBtn() {
         }
     }, [mainAreaRef])
     return (
-        <Button variant={'secondary'} className={`w-full md:w-auto hover:underline`} onClick={scrollToMainArea}>
-            Go to Tracker ↗
+        <Button variant={'outline'} className={`w-full md:w-auto hover:underline bg-[#111111] hover:bg-white/5 hover:text-white`} onClick={scrollToMainArea}>
+            Go to Tracker
         </Button>
     )
 }

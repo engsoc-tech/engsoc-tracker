@@ -1,5 +1,6 @@
+import { saveResultsToDB } from "@/data-access/applications";
+import { pullNewApplications } from "@/lib/pull-applications";
 
-import { runScrapeJob } from '../core/main'
 
 console.log('Initializing cron route...');
 
@@ -16,15 +17,14 @@ function getMillisecondsUntilNextRun() {
 export async function initializeCronJob() {
     console.log('Initializing cron job...');
     if (isInitialized) {
-        console.log('Cron job already initialized or initializing. Exiting...');
-        return;
+        return "Cron job already initialized or initializing. Exiting..."
     }
 
     console.log('Running initial scrape job...');
     isRunning = true;
     try {
-        await runScrapeJob();
-        console.log('Initial scrape job completed');
+        await runCronJob();
+
     } catch (error) {
         console.error('Error in initial scrape job:', error);
         throw error; // Rethrow to prevent initialization on error
@@ -45,22 +45,27 @@ export async function initializeCronJob() {
     scheduleNextRun();
 
     isInitialized = true;
-    console.log('Cron job fully initialized');
+    return "Cron job initialized successfully";
 }
-
-async function runCronJob() {
-    console.log('Attempting to run cron job at:', new Date().toISOString());
+export async function runCronJob() {
     if (isRunning) {
-        console.log('Cron job is already running. Exiting...');
+        console.log('Cron job is already running');
         return;
     }
-    console.log('Starting scrape job...');
+
+    console.log('Running pullNewApplications job');
     isRunning = true;
     try {
-        await runScrapeJob();
-        console.log('Scrape job completed successfully');
+        const results = await pullNewApplications();
+        console.log(`Retrieved ${results.length} results`);
+
+        console.log('Saving results to database');
+        await saveResultsToDB(results);
+        console.log('Results saved successfully');
+
+        console.log('pullNewApplications job completed successfully');
     } catch (error) {
-        console.error('Error occurred during scrape job:', error);
+        console.error('Error in pullNewApplications job:', error);
     } finally {
         isRunning = false;
     }
@@ -68,16 +73,15 @@ async function runCronJob() {
 
 export function stopCronJob() {
     if (!isInitialized || !intervalId) {
-        console.error("Cron job is not initialized or interval doesn't exist.");
-        return;
+        return "Cron job is not initialized or interval doesn't exist."
     } else {
         try {
             clearTimeout(intervalId);
             intervalId = null;
             isInitialized = false;
-            console.log("Cron job stopped successfully.");
+            return "Cron job stopped successfully";
         } catch (e) {
-            console.error("Error stopping cron job: " + e);
+            return `Error stopping cron job: ${e instanceof Error ? e.message : String(e)}`;
         }
     }
 }

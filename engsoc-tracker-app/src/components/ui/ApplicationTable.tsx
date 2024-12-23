@@ -16,7 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { cn, formatDate } from "@/lib/utils"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import {
     Popover,
     PopoverContent,
@@ -30,18 +29,14 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
-import { mockApplications } from "@/lib/mock-data"
 import { ApplicationType } from "@/schemas/applications"
 import { EngineeringType } from "@prisma/client"
 import { EngineeringTypes, SelectableEngineeringType, SelectableEngineeringTypes, SelectablePositonType } from "@/core/map"
-import { EngineeringTypeType } from "../../../prisma/generated/zod"
-import { PositionType } from "../../schemas/applications"
 
 
 
 
 export default function ApplicationTable({ }) {
-    const selectableTypes = [...EngineeringTypes, "all"];
     const [selectedType, setSelectedType] = useState<SelectablePositonType>("all")
     const [currentPage, setCurrentPage] = useState(1)
     const [applications, setApplications] = useState<ApplicationType[]>([])
@@ -49,63 +44,59 @@ export default function ApplicationTable({ }) {
     const [selectedEngineering, setSelectedEngineering] = useState<SelectableEngineeringType>("all")
     const [searchDialogOpen, setSearchDialogOpen] = useState(false)
     const itemsPerPage = 5
+
     useEffect(() => {
-        //begins the periodic scrape job if it's not already running 
-        fetch('/api/cron');
-    }, []);
-    useEffect(() => {
-        const fetchData = async () => {
+        const main = async () => {
             try {
+                //begins the periodic scrape job if it's not already running 
+                const cronRes = await fetch('/api/cron?action=run');
+                if (!cronRes.ok) {
+                    throw new Error('Failed to start cron job');
+                }
                 const response = await fetch('/api/applications?_limit=10&_offset=0')
                 if (!response.ok) {
                     throw new Error('Failed to fetch applications')
                 }
-                const data = await response.json()
-                setApplications(data.data)
+                const apps = (await response.json()).applications
+                console.log('Setting applications to:', apps)
+                setApplications(apps)
             } catch (error) {
                 console.error('Error fetching applications:', error)
+                //do toasts here
             } finally {
                 setIsLoading(false)
             }
         }
 
-        fetchData()
-    }, [])
+        main()
+    }, []);
+
     const filteredApplications = useMemo(() => {
         console.log('Recalculating filteredApplications')
         console.log('Current filters:', { selectedType, selectedEngineering })
+        console.log("All applications:", applications)
+        if (!applications || applications.length === 0) return [];
         const filtered = applications.filter(
-            (app) => {
-                console.log("app type lowercase", app.type.toLowerCase(), "selected type lowercase", selectedType.toLowerCase())
-                const typeMatch = (selectedType === "all" || app.type.toLowerCase() === selectedType.toLowerCase())
-                const engineeringMatch = selectedEngineering === "all" || app.engineering.includes(selectedEngineering as EngineeringType)
-                const currentDate = new Date()
-                const dateValid = isAfter(app.closeDate, currentDate)
-                console.log("datevalid", dateValid)
-                console.log('Application filter results:', { app, typeMatch, dateValid })
-                return typeMatch && dateValid && engineeringMatch
-            }
+            (app) => (selectedType === 'all' || app.type.toLowerCase() === selectedType.toLowerCase()) &&
+                (selectedEngineering === 'all' || app.engineering.some(eng => eng.toLowerCase() === selectedEngineering.toLowerCase()))
         );
-        console.log('Filtered applications count:', filtered.length)
+        console.log('Filtered applications:', filtered)
         return filtered;
     }, [selectedType, selectedEngineering, applications]);
 
-
-    console.log('Starting to group applications')
-    const groupedApplications = filteredApplications.reduce((acc, app) => {
-        console.log('Grouping application:', app)
-        app.engineering.forEach(eng => {
-            if (eng === selectedEngineering || selectedEngineering === "all") {
+    const groupedApplications = useMemo(() => {
+        if (!filteredApplications) return {};
+        return filteredApplications.reduce((acc, app) => {
+            app.engineering.forEach(eng => {
                 if (!acc[eng]) {
-                    console.log('Creating new group for engineering type:', eng)
-                    acc[eng] = []
+                    acc[eng] = [];
                 }
-                acc[eng].push(app)
-                console.log('Added application to group:', eng)
-            }
-        })
-        return acc
-    }, {} as Record<string, ApplicationType[]>)
+                acc[eng].push(app);
+            });
+            return acc;
+        }, {} as Record<string, ApplicationType[]>);
+    }, [filteredApplications]);
+
     console.log('Grouped applications result:', Object.keys(groupedApplications).map(key => `${key}: ${groupedApplications[key].length} items`))
 
     const totalPages = Math.ceil(Object.keys(groupedApplications).length / itemsPerPage)
@@ -116,7 +107,6 @@ export default function ApplicationTable({ }) {
             currentPage * itemsPerPage
         )
     )
-
     const getDeadlineStatus = (closeDate: string) => {
         const now = new Date()
         const deadline = parseISO(closeDate)
@@ -180,14 +170,14 @@ export default function ApplicationTable({ }) {
                     ))
                 ) : (
                     Object.entries(paginatedApplications).map(([engineering, apps]) => (
-                        <React.Fragment key={engineering + apps.toString()}>
+                        <React.Fragment key={engineering}>
                             <TableRow>
                                 <TableCell colSpan={9} className="bg-black/80 text-white font-bold">
                                     {engineering} Engineering
                                 </TableCell>
                             </TableRow>
                             {apps.map((app) => (
-                                <TableRow key={app.id}>
+                                <TableRow key={`${engineering}-${app.id}`}>
                                     <TableCell className="font-medium">{app.programme}</TableCell>
                                     <TableCell>{app.company}</TableCell>
                                     <TableCell className="hidden md:table-cell opacity-80">{
@@ -237,7 +227,7 @@ export default function ApplicationTable({ }) {
     )
 
     return (
-        <div className="flex flex-col justify-between h-full" >
+        <div className="flex flex-col justify-between h-full" id="mainArea">
 
             <Tabs defaultValue="all" className="p-4 h-full" onValueChange={newVal => { setSelectedType(newVal as SelectablePositonType) }}>
 
