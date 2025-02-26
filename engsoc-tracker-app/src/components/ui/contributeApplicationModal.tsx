@@ -66,9 +66,9 @@ export function ContributeApplicationModal() {
                 openDate: new Date(formData.openDate.split("/").reverse().join("-")),
                 closeDate: new Date(formData.closeDate.split("/").reverse().join("-")),
             }
-            const res = await submitApplicationAction(submissionData)
+            const res = await submitApplicationAction(submissionData);
             if (!res || !res.data) {
-                throw new Error("Something went wrong while submitting the application, please try again later (NORES)")
+                throw new Error("Something went wrong while submitting the application, please try again later (NORES)" + res?.serverError + res?.validationErrors)
             }
             const result = res.data
             if ("success" in result) {
