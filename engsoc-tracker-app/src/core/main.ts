@@ -6,52 +6,22 @@ import { EngineeringURLtype } from './map';
 import { scrapeGradcracker } from './gradcracker';
 import { z } from 'zod';
 import { ApplicationSchema } from '../../prisma/generated/zod';
-const SCRAPE_GRADCRACKER_INTERVAL = 5 * 60 * 1000 // 5 minutes
+const SCRAPE_INTERVAL = 5 * 60 * 1000 // 5 minutes
 export async function scrapeAllSources(): Promise<ApplicationType[]> {
     console.log('Starting scrape job for all sources...')
-
     try {
-        console.log('Checking if a scrape job is already running...')
-        let config;
-        try {
-            console.log('Querying AppConfig...')
-            config = await prisma.appConfig.findUnique({
-                where: {
-                    id: 'config'
-                }
-            })
-            console.log('AppConfig query result:', config)
-        } catch (prismaError) {
-            console.error('Error querying AppConfig:', prismaError)
-            throw prismaError
-        }
-        //ENABLE LATER
-        // if (config?.isUpdating) {
-        //     console.log('Scrape job is already running. Exiting...')
-        //     return []
-        // }
-
-        console.log('Updating AppConfig to indicate scrape job is starting...')
-        await prisma.appConfig.upsert({
-            where: { id: 'config' },
-            update: { isUpdating: true, lastUpdated: new Date() },
-            create: { id: 'config', isUpdating: true, lastUpdated: new Date() }
-        })
-        console.log('AppConfig updated successfully.')
-
         let allApplications: ApplicationType[] = []
 
         allApplications = [...await scrapeGradcracker()];
 
         console.log(`Scraping completed. Total applications scraped: ${allApplications.length}`)
-
-        console.log('Updating AppConfig to indicate scrape job is finished...')
-        await prisma.appConfig.update({
+        console.log('Updating AppConfig to indicate scrape job is starting...')
+        await prisma.appConfig.upsert({
             where: { id: 'config' },
-            data: { isUpdating: false, lastUpdated: new Date() }
+            update: { lastUpdated: new Date() },
+            create: { id: 'config', shouldKeepUpdating: false, lastUpdated: new Date() }
         })
-        console.log('AppConfig updated successfully.')
-
+        console.log('AppConfig updated successfully REturning all applications')
         return allApplications
     } catch (error) {
         console.error('Error in scrapeAllSources:', error)
@@ -60,11 +30,7 @@ export async function scrapeAllSources(): Promise<ApplicationType[]> {
             console.error('Error message:', error.message)
             console.error('Error stack:', error.stack)
         }
-        console.log('Updating AppConfig to indicate scrape job failed...')
-        await prisma.appConfig.update({
-            where: { id: 'config' },
-            data: { isUpdating: false, lastUpdated: new Date() }
-        })
+
         console.log('AppConfig updated to reflect failed state.')
         throw error
     }
@@ -81,27 +47,33 @@ export async function updateDatabase(applications: ApplicationType[]): Promise<v
 
                 // Check if the application already exists in the database
                 console.log(`Checking for existing application with id: ${app.id}`)
-                const existingAp = await tx.application.findUnique({
-                    where: { id: app.id },
+                const existingAp = await tx.application.findMany({
+                    where: {
+                        programme: app.programme,
+                        company: app.company,
+                    },
                 })
 
                 console.log(`Existing application found: ${existingAp ? 'Yes' : 'No'}`)
-                if (existingAp) {
+                if (existingAp.length > 0) {
                     console.log(`Updating existing application: ${app.id}`)
                     console.log('Update data:', JSON.stringify(app, null, 2))
 
 
-
+                    const { id, ...appl } = app;
+                    console.log("existingapplications with this detail already exists")
                     //PAYLOAD MUST BE OF TYPE OBJECT RECEIVED NULL i stg
                     return await tx.application.update({
                         where: { id: app.id },
-                        data: app,
+                        data: appl,
                     })
                     // (If the application exists, update it)
                 } else {
                     console.log(`Creating new application: ${app.id}`)
                     console.log('Create data:', JSON.stringify(app, null, 2))
 
+                    //separate the app from the id
+                    const { id, ...appl } = app;
                     // If the application doesn't exist, create a new one
                     return await tx.application.create({
                         data: app,
@@ -144,7 +116,7 @@ export async function removeExpiredApplications(): Promise<void> {
     }
 }
 
-export async function runScrapeJob(): Promise<void> {
+export async function runScrapeJob(): Promise<{ success: boolean }> {
     console.log('Starting scrape job...')
     try {
         console.log('Initiating scraping from all sources...')
@@ -155,11 +127,12 @@ export async function runScrapeJob(): Promise<void> {
         await updateDatabase(applications)
         console.log('Database update completed.')
 
-        // console.log('Removing expired applications...')
-        // await removeExpiredApplications()
-        // console.log('Expired applications removed.')
+        console.log('Removing expired applications...')
+        await removeExpiredApplications()
+        console.log('Expired applications removed.')
 
-        console.log('Scrape job completed successfully.')
+        console.log('Scrape job completed successfully.');
+        return { success: true }
     } catch (error) {
         console.error('An error occurred during the scrape job:', error)
         if (error instanceof Error) {
@@ -167,5 +140,6 @@ export async function runScrapeJob(): Promise<void> {
             console.error('Error message:', error.message)
             // console.error('Error stack:', error.stack)
         }
+        return { success: false }
     }
 }

@@ -4,7 +4,7 @@ import { applicationDescription, applicationName } from "../app-config";
 import { mainFont } from "../lib/fonts";
 import { Navbar } from "../components/ui/Navbar";
 import { env } from "@/env";
-
+import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: applicationName,
   description: applicationDescription,
@@ -32,6 +32,7 @@ export default function RootLayout({
             {children}
           </main>
         </div>
+        <Toaster />
       </body>
     </html>
   )

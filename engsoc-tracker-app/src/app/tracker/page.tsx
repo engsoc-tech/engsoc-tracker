@@ -20,14 +20,15 @@ export default function TrackingPage() {
           <section className="aboveTheTracker  text-white pt-2 pb-8">
             <div className="max-w-4xl mx-auto flex flex-col items-center pt-4">
               <img className="brightness-90 object-scale-down" src="EngsocLogoClipped.png" width={100} alt="Warwick Engienering Society" />
-              <h2 className="text-2xl font-bold mt-6 mb-3 text-gray-100 text-center">The #1 Application Tracker For Engineering Students</h2>
+              <h2 className="text-2xl font-bold mt-6 mb-3 text-gray-100 text-center">The #1 Application tracker for Engineering Careers</h2>
               <div className="space-y-4 mb-8 flex flex-col items-center">
                 <article className="text-gray-300 font-normal leading-relaxed text-center ">
-                  The Engineering Application Tracker is a comprehensive tool designed to help students at the University of Warwick manage their engineering internship and job applications. It provides a centralized platform to track application deadlines, requirements, and progress across various companies and roles.
+                  The Engineering Application Tracker is a comprehensive tool designed to help students find engineering internship and job applications. It provides a centralized platform to track application deadlines, requirements, and progress across various companies and roles.
                 </article>
                 <GoToTrackerBtn />
               </div>
               <Faqs />
+              {/* <p className='mt-4 opacity-20'>Made by Tye Goulder</p> */}
             </div>
           </section>
         </div>
@@ -54,7 +55,7 @@ export default function TrackingPage() {
               />
               <div>
                 <h2 className="text-lg font-semibold">Warwick Engineering Society</h2>
-                <p className="text-sm text-gray-400">Bridging Academia and Industry</p>
+                <p className="text-sm text-gray-400">Bridging the gap between academic studies and the working environment.</p>
               </div>
             </div>
 

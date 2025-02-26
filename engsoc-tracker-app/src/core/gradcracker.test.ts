@@ -89,28 +89,28 @@ describe('Gradcracker Scraper', () => {
         });
     });
 
-    // describe('scrapeGradcracker - Online Test', () => {
-    //     it('should scrape applications from live website', async () => {
-    //         jest.setTimeout(30000); // Increase timeout for online test
-    //         const applications = await scrapeGradcracker('computing-technology');
-    //         expect(applications).toBeInstanceOf(Array);
-    //         expect(applications.length).toBeGreaterThan(0);
+    describe('scrapeGradcracker - Online Test', () => {
+        it('should scrape applications from live website', async () => {
+            jest.setTimeout(500000); // Increase timeout for online test
+            const applications = await scrapeGradcracker('computing-technology');
+            expect(applications).toBeInstanceOf(Array);
+            expect(applications.length).toBeGreaterThan(0);
 
-    //         const firstApp = applications[0];
-    //         expect(firstApp).toHaveProperty('id');
-    //         expect(firstApp).toHaveProperty('programme');
-    //         expect(firstApp).toHaveProperty('company');
-    //         expect(firstApp).toHaveProperty('type');
-    //         expect(firstApp).toHaveProperty('engineering');
-    //         expect(firstApp).toHaveProperty('openDate');
-    //         expect(firstApp).toHaveProperty('closeDate');
-    //         expect(firstApp).toHaveProperty('requiresCv');
-    //         expect(firstApp).toHaveProperty('requiresCoverLetter');
-    //         expect(firstApp).toHaveProperty('requiresWrittenAnswers');
-    //         expect(firstApp).toHaveProperty('isSponsored');
-    //         expect(firstApp).toHaveProperty('notes');
-    //         expect(firstApp).toHaveProperty('link');
-    //     }, 30000);
-    // });
+            const firstApp = applications[0];
+            expect(firstApp).toHaveProperty('id');
+            expect(firstApp).toHaveProperty('programme');
+            expect(firstApp).toHaveProperty('company');
+            expect(firstApp).toHaveProperty('type');
+            expect(firstApp).toHaveProperty('engineering');
+            expect(firstApp).toHaveProperty('openDate');
+            expect(firstApp).toHaveProperty('closeDate');
+            expect(firstApp).toHaveProperty('requiresCv');
+            expect(firstApp).toHaveProperty('requiresCoverLetter');
+            expect(firstApp).toHaveProperty('requiresWrittenAnswers');
+            expect(firstApp).toHaveProperty('isSponsored');
+            expect(firstApp).toHaveProperty('notes');
+            expect(firstApp).toHaveProperty('link');
+        }, 500000);
+    });
 });
 

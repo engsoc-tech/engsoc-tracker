@@ -1,7 +1,8 @@
 
 import { Hono } from 'hono'
-import { getCronStatus, initializeCronJob, stopCronJob } from '@/core/cron';
+import { initializeCronJob, stopCronJob } from '@/core/cron';
 import { env } from '@/env';
+import { getCronStatus } from '@/core/cron/status';
 
 console.log('Initializing cron route...');
 

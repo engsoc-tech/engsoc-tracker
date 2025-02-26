@@ -37,7 +37,7 @@ function useProxyURL(targetUrl: string): string {
         throw new Error("PROXY_URL or PROXY_API_KEY is not defined in .env file.");
     }
 
-    const proxyUrl = `${PROXY_URL}${new URLSearchParams({
+    const proxyUrl = `${PROXY_URL}?${new URLSearchParams({
         api_key: PROXY_API_KEY,
         url: targetUrl
     })}`;

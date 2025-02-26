@@ -5,12 +5,15 @@ type Props = {}
 const developers: Developer[] = [
     {
         name: "Tye Goulder",
-        link: "https://media.licdn.com/dms/image/v2/D4E03AQGn7IjdY5i0Kg/profile-displayphoto-shrink_400_400/B4EZOjqKkzGYAg-/0/1733617560333?e=1740614400&v=beta&t=XQpzkr0SDyR2CSBON24M6o416sKK96-eFuGJ6R8Bev8",
+
+        link: "tye.jpg",
         linkedinUrl: "https://www.linkedin.com/in/tye-goulder/",
-        websiteUrl: "https://www.tyegoulder.com/",
+        websiteUrl: "https://buildwithtye.com",
         roleInProject: "Lead Developer",
         roleInEngSoc: "Tech Representitive"
     },
+
+    // { name: "Ege Cavus", roleInProject: 'Project Supervisor', roleInEngSoc: 'Technology Officer', link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" }
 ];
 type Developer = {
     name: string;
@@ -21,13 +24,15 @@ type Developer = {
     roleInEngSoc: string;
 }
 const societyMembers = [
-    { name: "Darina Mollova", link: "https://media.licdn.com/dms/image/v2/D4D03AQE7UjhU5N8KiQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1700155602640?e=1737590400&v=beta&t=o7V3ci48S_OfP7rP6CbTvd4rB6vVVktsR_VB4kKt2JM" },
-    { name: "Lily Hayes", link: "https://media.licdn.com/dms/image/v2/D4E03AQE7RNYqtbC-Ew/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1713867586307?e=1737590400&v=beta&t=eJNDQTfE2ANezuQukTMjjA9qHFPnR_eDOp8NGMuxvrc" },
-    { name: "Jash Navati", link: "https://media.licdn.com/dms/image/v2/D4E03AQF6YXtxeqYKtA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1700051030471?e=1737590400&v=beta&t=2Y5fFfWICBgrvzUrJ3g1vIlZNtJZiFnVyq99BYHdFYk" },
-    { name: "Mihir Annapureddy", link: "https://media.licdn.com/dms/image/v2/C4E03AQEvn5Reid0BOA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1667924463348?e=1737590400&v=beta&t=Q5nyPbnZBjv_iepQ1vqssEXWExqKL3ZzlTfDopNU7mE" },
-    { name: "Karam Sandhar", link: "https://media.licdn.com/dms/image/v2/D4E03AQG9L7V5dyBSnw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1710706199013?e=1737590400&v=beta&t=xqPEhnHgboEt45ZkqMUmMdS_saLdgplNVUgfWCT3m9o" },
-    { name: "Ege Cavus", link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" },
-    { name: "Tye Goulder", link: "https://media.licdn.com/dms/image/v2/D4E03AQGn7IjdY5i0Kg/profile-displayphoto-shrink_400_400/B4EZOjqKkzGYAg-/0/1733617560333?e=1740614400&v=beta&t=XQpzkr0SDyR2CSBON24M6o416sKK96-eFuGJ6R8Bev8" },
+
+    { name: "Darina Mollova", link: "darina.jpg" },
+    { name: "Lily Hayes", link: "lily.jpg" },
+    { name: "Jash Navati", link: "jash.jpg" },
+    { name: "Mihir Annapureddy", link: "mihir.jpg" },
+    { name: "Karam Sandhar", link: "karam.jpg" },
+    { name: "Ege Cavus", link: "ege.jpg" },
+    { name: "Tye Goulder", link: "tye.jpg" },
+
 ]
 const accordionContent = [
     {
@@ -56,7 +61,9 @@ const accordionContent = [
 function Faqs({ }: Props) {
     return (
         <div className="bg-neutral-900/90 p-4 rounded-xl w-full">
-            <Accordion defaultValue='item-1' type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
+            <Accordion
+                defaultValue='item-1'
+                type="single" collapsible className="w-full [&_[data-radix-accordion-content]]:!pb-4">
                 {accordionContent.map((item, index) => (
                     <AccordionItem
                         key={index}

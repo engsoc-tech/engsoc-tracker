@@ -1,5 +1,6 @@
 
 import { runScrapeJob } from '../core/main'
+import { getCronStatus } from './cron/status';
 
 console.log('Initializing cron route...');
 
@@ -14,19 +15,17 @@ function getMillisecondsUntilNextRun() {
 }
 
 export async function initializeCronJob() {
-    console.log('Initializing cron job...');
-    if (isInitialized) {
-        console.log('Cron job already initialized or initializing. Exiting...');
+    const shouldKeepUpdating = await getCronStatus();
+    if (shouldKeepUpdating) {
+        console.log('Cron job already initialized. Exiting...');
         return;
     }
-
-    console.log('Running initial scrape job...');
-    isRunning = true;
+    console.log('Initializing cron job...');
     try {
         await runScrapeJob();
         console.log('Initial scrape job completed');
     } catch (error) {
-        console.error('Error in initial scrape job:', error);
+        console.error('Error in scrape job:', error);
         throw error; // Rethrow to prevent initialization on error
     } finally {
         isRunning = false;
@@ -80,11 +79,6 @@ export function stopCronJob() {
             console.error("Error stopping cron job: " + e);
         }
     }
-}
-
-export function getCronStatus() {
-    console.log(`Current status - isRunning: ${isRunning}, isInitialized: ${isInitialized}`);
-    return { isInitialized, isRunning }
 }
 
 console.log('Cron route setup complete');
