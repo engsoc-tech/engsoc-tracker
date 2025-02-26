@@ -1,4 +1,4 @@
-import { Geist } from "next/font/google";
+import { Lato } from "next/font/google";
 
 //WHEN WE HAVE ACCESS TO THE PAID ROC-GROTESK FONT
 // import localFont from "next/font/local";
@@ -9,8 +9,8 @@ import { Geist } from "next/font/google";
 //   });
 // export const mainFont = rocGrotesk;
 
-export const giest = Geist({
-    weight: 'variable',
+export const giest = Lato({
+    weight: ['400', '700'],
     style: 'normal',
     subsets: ['latin'],
     // display: 'swap', 

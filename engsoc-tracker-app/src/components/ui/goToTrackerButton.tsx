@@ -22,10 +22,12 @@ function GoToTrackerBtn() {
             console.warn('Main area ref is not set');
         }
     }, [mainAreaRef])
-    return (
-        <Button variant={'secondary'} className={`w-full md:w-auto hover:underline`} onClick={scrollToMainArea}>
+    return (<>
+
+        {/* <Button variant={'secondary'} className={`w-full md:w-auto hover:underline`} onClick={scrollToMainArea}>
             Go to Tracker ↗
-        </Button>
+        </Button> */}
+    </>
     )
 }
 

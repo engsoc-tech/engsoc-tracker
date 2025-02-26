@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from "react"
-import { formatDistanceToNowStrict, parseISO, format, differenceInDays, isAfter } from 'date-fns'
+import { formatDistanceToNowStrict, parseISO, format, differenceInDays, isAfter, differenceInMonths } from 'date-fns'
 import { Check, X, ChevronLeft, ChevronRight, ChevronsUpDown } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import {
@@ -51,7 +51,7 @@ export default function ApplicationTable({ }) {
     const itemsPerPage = 5
     useEffect(() => {
         //begins the periodic scrape job if it's not already running 
-        fetch('/api/cron');
+        process.env.NODE_ENV == "development" && fetch('/api/cron');
     }, []);
     useEffect(() => {
         const fetchData = async () => {
@@ -195,7 +195,16 @@ export default function ApplicationTable({ }) {
                                     }</TableCell>
                                     <TableCell>
                                         <Badge className={`${getDeadlineStatus(app.closeDate instanceof Date ? app.closeDate.toISOString() : app.closeDate)} cursor-pointer`}>
-                                            {formatDate(app.closeDate)}
+                                            {app.closeDate &&
+                                                differenceInMonths(
+                                                    app.closeDate instanceof Date ? app.closeDate : parseISO(app.closeDate),
+                                                    new Date()
+                                                ) > 5
+                                                ? "Ongoing"
+                                                : format(
+                                                    app.closeDate instanceof Date ? app.closeDate : parseISO(app.closeDate),
+                                                    "yyyy-MM-dd" // or whatever format you need from your formatDate function
+                                                )}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="hidden sm:table-cell">
