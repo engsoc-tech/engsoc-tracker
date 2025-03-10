@@ -23,10 +23,10 @@ testsRoute.get('/gradcracker', zValidator('query', z.object({
 
     try {
 
-        const scraped = await scrapeGradcrackerDiscipline('aerospace')
+
         return c.json({
             success: true,
-            data: scraped
+            data: "scraped"
         })
     } catch (error) {
         if (error instanceof z.ZodError) {

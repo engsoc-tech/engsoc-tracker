@@ -18,13 +18,14 @@ export async function getApplications(limit: number, offset: number): Promise<Ap
 
 
 export async function submitApplication(
-    data: Omit<Application, "id" | "isSponsored" | "verified">,
+    data: Omit<Application, "id" | "isSponsored" | "verified" | "origProgramme" | "postChecked">,
 ): Promise<{ success: boolean; data?: Application; error?: string }> {
     console.log(" [submitApplication]  data:", data)
     try {
         const application = await prisma.application.create({
             data: {
                 ...data,
+                origProgramme: data.programme,
                 id: `${data.company}-${data.programme}`.replace(/[\s-]+/g, '-').toLowerCase(),
                 isSponsored: false,
                 verified: false,
@@ -59,3 +60,6 @@ export async function deleteApplication(id: string): Promise<void> {
     })
 }
 
+export async function deleteApplications(): Promise<void> {
+    await prisma.application.deleteMany()
+}

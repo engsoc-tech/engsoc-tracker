@@ -7,7 +7,6 @@ import { ModifiedApplicationSchema } from '@/schemas/applications'
 import { rateLimit } from '@/middleware/rateLimit'
 import prisma from '@/db/prisma'
 import { getApplications } from '@/core/applications'
-import { mockApplications } from '@/lib/mock-data'
 
 
 const applicationsRoute = new Hono()
@@ -26,9 +25,9 @@ applicationsRoute.get('/', zValidator('query', z.object({
 
     try {
         const applications = await fetchApplicationsFromDB(limit, offset)
-        console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
+        // console.log(`Fetched ${applications.length} applications. They are: ${console.dir(applications, { depth: null })}`)
         const validatedApplications = z.array(ModifiedApplicationSchema).parse(applications)
-        console.log('Applications data validated successfully')
+        // console.log('Applications data validated successfully')
 
 
         //return mock data instead
@@ -54,12 +53,12 @@ async function fetchApplicationsFromDB(limit: number, offset: number): Promise<z
         console.log('Querying database...');
         const applications = await getApplications(limit, offset);
         console.log(`Retrieved ${applications.length} applications from database`);
-        console.log('Raw applications:');
+        // console.log('Raw applications:');
         console.dir(applications, { depth: null });
 
         console.log('Converting application data...');
         const convertedApplications = applications.map(app => {
-            console.log(`Converting application with ID: ${app.id}`);
+            // console.log(`Converting application with ID: ${app.id}`);
             const convertedApp = {
                 ...app,
                 type: app.type,
@@ -68,8 +67,8 @@ async function fetchApplicationsFromDB(limit: number, offset: number): Promise<z
                 requiresWrittenAnswers: app.requiresWrittenAnswers ?? false,
                 isSponsored: app.isSponsored ?? undefined,
             };
-            console.log('Converted application:');
-            console.dir(convertedApp, { depth: null });
+            // console.log('Converted application:');
+            // console.dir(convertedApp, { depth: null });
             return convertedApp;
         });
 

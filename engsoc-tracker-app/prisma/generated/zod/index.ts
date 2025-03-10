@@ -20,9 +20,9 @@ export const UserScalarFieldEnumSchema = z.enum(['id','email','emailVerified','n
 
 export const AccountScalarFieldEnumSchema = z.enum(['id','userId','password','salt']);
 
-export const ApplicationScalarFieldEnumSchema = z.enum(['id','programme','company','type','engineering','openDate','closeDate','requiresCv','requiresCoverLetter','requiresWrittenAnswers','notes','link','isSponsored','verified']);
+export const ApplicationScalarFieldEnumSchema = z.enum(['id','programme','origProgramme','company','type','engineering','openDate','closeDate','requiresCv','requiresCoverLetter','requiresWrittenAnswers','notes','link','isSponsored','verified','postChecked']);
 
-export const AppConfigScalarFieldEnumSchema = z.enum(['id','lastUpdated','shouldKeepUpdating']);
+export const AppConfigScalarFieldEnumSchema = z.enum(['id','lastUpdated','shouldKeepUpdating','maxInEachDiscipline','maxInEachType']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -119,6 +119,7 @@ export const ApplicationSchema = z.object({
   engineering: EngineeringTypeSchema.array(),
   id: z.string(),
   programme: z.string(),
+  origProgramme: z.string(),
   company: z.string(),
   openDate: z.coerce.date(),
   closeDate: z.coerce.date(),
@@ -129,6 +130,7 @@ export const ApplicationSchema = z.object({
   link: z.string(),
   isSponsored: z.boolean(),
   verified: z.boolean(),
+  postChecked: z.boolean(),
 })
 
 export type Application = z.infer<typeof ApplicationSchema>
@@ -141,6 +143,8 @@ export const AppConfigSchema = z.object({
   id: z.string(),
   lastUpdated: z.coerce.date(),
   shouldKeepUpdating: z.boolean(),
+  maxInEachDiscipline: z.number().int(),
+  maxInEachType: z.number().int(),
 })
 
 export type AppConfig = z.infer<typeof AppConfigSchema>
@@ -259,6 +263,7 @@ export const ApplicationArgsSchema: z.ZodType<Prisma.ApplicationDefaultArgs> = z
 export const ApplicationSelectSchema: z.ZodType<Prisma.ApplicationSelect> = z.object({
   id: z.boolean().optional(),
   programme: z.boolean().optional(),
+  origProgramme: z.boolean().optional(),
   company: z.boolean().optional(),
   type: z.boolean().optional(),
   engineering: z.boolean().optional(),
@@ -271,6 +276,7 @@ export const ApplicationSelectSchema: z.ZodType<Prisma.ApplicationSelect> = z.ob
   link: z.boolean().optional(),
   isSponsored: z.boolean().optional(),
   verified: z.boolean().optional(),
+  postChecked: z.boolean().optional(),
 }).strict()
 
 // APP CONFIG
@@ -284,6 +290,8 @@ export const AppConfigSelectSchema: z.ZodType<Prisma.AppConfigSelect> = z.object
   id: z.boolean().optional(),
   lastUpdated: z.boolean().optional(),
   shouldKeepUpdating: z.boolean().optional(),
+  maxInEachDiscipline: z.boolean().optional(),
+  maxInEachType: z.boolean().optional(),
 }).strict()
 
 
@@ -591,6 +599,7 @@ export const ApplicationWhereInputSchema: z.ZodType<Prisma.ApplicationWhereInput
   NOT: z.union([ z.lazy(() => ApplicationWhereInputSchema),z.lazy(() => ApplicationWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   programme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  origProgramme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   type: z.union([ z.lazy(() => EnumPositionTypeFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
@@ -603,11 +612,13 @@ export const ApplicationWhereInputSchema: z.ZodType<Prisma.ApplicationWhereInput
   link: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   isSponsored: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   verified: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  postChecked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
 }).strict();
 
 export const ApplicationOrderByWithRelationInputSchema: z.ZodType<Prisma.ApplicationOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   programme: z.lazy(() => SortOrderSchema).optional(),
+  origProgramme: z.lazy(() => SortOrderSchema).optional(),
   company: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
   engineering: z.lazy(() => SortOrderSchema).optional(),
@@ -619,7 +630,8 @@ export const ApplicationOrderByWithRelationInputSchema: z.ZodType<Prisma.Applica
   notes: z.lazy(() => SortOrderSchema).optional(),
   link: z.lazy(() => SortOrderSchema).optional(),
   isSponsored: z.lazy(() => SortOrderSchema).optional(),
-  verified: z.lazy(() => SortOrderSchema).optional()
+  verified: z.lazy(() => SortOrderSchema).optional(),
+  postChecked: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ApplicationWhereUniqueInputSchema: z.ZodType<Prisma.ApplicationWhereUniqueInput> = z.union([
@@ -641,6 +653,7 @@ export const ApplicationWhereUniqueInputSchema: z.ZodType<Prisma.ApplicationWher
   OR: z.lazy(() => ApplicationWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => ApplicationWhereInputSchema),z.lazy(() => ApplicationWhereInputSchema).array() ]).optional(),
   programme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  origProgramme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   type: z.union([ z.lazy(() => EnumPositionTypeFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
@@ -652,11 +665,13 @@ export const ApplicationWhereUniqueInputSchema: z.ZodType<Prisma.ApplicationWher
   notes: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   isSponsored: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   verified: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  postChecked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
 }).strict());
 
 export const ApplicationOrderByWithAggregationInputSchema: z.ZodType<Prisma.ApplicationOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   programme: z.lazy(() => SortOrderSchema).optional(),
+  origProgramme: z.lazy(() => SortOrderSchema).optional(),
   company: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
   engineering: z.lazy(() => SortOrderSchema).optional(),
@@ -669,6 +684,7 @@ export const ApplicationOrderByWithAggregationInputSchema: z.ZodType<Prisma.Appl
   link: z.lazy(() => SortOrderSchema).optional(),
   isSponsored: z.lazy(() => SortOrderSchema).optional(),
   verified: z.lazy(() => SortOrderSchema).optional(),
+  postChecked: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => ApplicationCountOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => ApplicationMaxOrderByAggregateInputSchema).optional(),
   _min: z.lazy(() => ApplicationMinOrderByAggregateInputSchema).optional()
@@ -680,6 +696,7 @@ export const ApplicationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.A
   NOT: z.union([ z.lazy(() => ApplicationScalarWhereWithAggregatesInputSchema),z.lazy(() => ApplicationScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   programme: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  origProgramme: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   company: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   type: z.union([ z.lazy(() => EnumPositionTypeWithAggregatesFilterSchema),z.lazy(() => PositionTypeSchema) ]).optional(),
   engineering: z.lazy(() => EnumEngineeringTypeNullableListFilterSchema).optional(),
@@ -692,6 +709,7 @@ export const ApplicationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.A
   link: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   isSponsored: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
   verified: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  postChecked: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
 }).strict();
 
 export const AppConfigWhereInputSchema: z.ZodType<Prisma.AppConfigWhereInput> = z.object({
@@ -701,12 +719,16 @@ export const AppConfigWhereInputSchema: z.ZodType<Prisma.AppConfigWhereInput> = 
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   lastUpdated: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   shouldKeepUpdating: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  maxInEachDiscipline: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
+  maxInEachType: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
 }).strict();
 
 export const AppConfigOrderByWithRelationInputSchema: z.ZodType<Prisma.AppConfigOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   lastUpdated: z.lazy(() => SortOrderSchema).optional(),
-  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional()
+  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AppConfigWhereUniqueInputSchema: z.ZodType<Prisma.AppConfigWhereUniqueInput> = z.object({
@@ -719,15 +741,21 @@ export const AppConfigWhereUniqueInputSchema: z.ZodType<Prisma.AppConfigWhereUni
   NOT: z.union([ z.lazy(() => AppConfigWhereInputSchema),z.lazy(() => AppConfigWhereInputSchema).array() ]).optional(),
   lastUpdated: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   shouldKeepUpdating: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  maxInEachDiscipline: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
+  maxInEachType: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
 }).strict());
 
 export const AppConfigOrderByWithAggregationInputSchema: z.ZodType<Prisma.AppConfigOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   lastUpdated: z.lazy(() => SortOrderSchema).optional(),
   shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => AppConfigCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => AppConfigAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => AppConfigMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => AppConfigMinOrderByAggregateInputSchema).optional()
+  _min: z.lazy(() => AppConfigMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => AppConfigSumOrderByAggregateInputSchema).optional()
 }).strict();
 
 export const AppConfigScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.AppConfigScalarWhereWithAggregatesInput> = z.object({
@@ -737,6 +765,8 @@ export const AppConfigScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.App
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   lastUpdated: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   shouldKeepUpdating: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  maxInEachDiscipline: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
+  maxInEachType: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
 }).strict();
 
 export const ResetTokensCreateInputSchema: z.ZodType<Prisma.ResetTokensCreateInput> = z.object({
@@ -978,8 +1008,9 @@ export const AccountUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AccountUnch
 }).strict();
 
 export const ApplicationCreateInputSchema: z.ZodType<Prisma.ApplicationCreateInput> = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   programme: z.string(),
+  origProgramme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -991,12 +1022,14 @@ export const ApplicationCreateInputSchema: z.ZodType<Prisma.ApplicationCreateInp
   notes: z.string().optional().nullable(),
   link: z.string(),
   isSponsored: z.boolean().optional(),
-  verified: z.boolean().optional()
+  verified: z.boolean().optional(),
+  postChecked: z.boolean().optional()
 }).strict();
 
 export const ApplicationUncheckedCreateInputSchema: z.ZodType<Prisma.ApplicationUncheckedCreateInput> = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   programme: z.string(),
+  origProgramme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1008,11 +1041,13 @@ export const ApplicationUncheckedCreateInputSchema: z.ZodType<Prisma.Application
   notes: z.string().optional().nullable(),
   link: z.string(),
   isSponsored: z.boolean().optional(),
-  verified: z.boolean().optional()
+  verified: z.boolean().optional(),
+  postChecked: z.boolean().optional()
 }).strict();
 
 export const ApplicationUpdateInputSchema: z.ZodType<Prisma.ApplicationUpdateInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  origProgramme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1025,10 +1060,12 @@ export const ApplicationUpdateInputSchema: z.ZodType<Prisma.ApplicationUpdateInp
   link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   isSponsored: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   verified: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  postChecked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const ApplicationUncheckedUpdateInputSchema: z.ZodType<Prisma.ApplicationUncheckedUpdateInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  origProgramme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1041,11 +1078,13 @@ export const ApplicationUncheckedUpdateInputSchema: z.ZodType<Prisma.Application
   link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   isSponsored: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   verified: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  postChecked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const ApplicationCreateManyInputSchema: z.ZodType<Prisma.ApplicationCreateManyInput> = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   programme: z.string(),
+  origProgramme: z.string(),
   company: z.string(),
   type: z.lazy(() => PositionTypeSchema),
   engineering: z.union([ z.lazy(() => ApplicationCreateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1057,11 +1096,13 @@ export const ApplicationCreateManyInputSchema: z.ZodType<Prisma.ApplicationCreat
   notes: z.string().optional().nullable(),
   link: z.string(),
   isSponsored: z.boolean().optional(),
-  verified: z.boolean().optional()
+  verified: z.boolean().optional(),
+  postChecked: z.boolean().optional()
 }).strict();
 
 export const ApplicationUpdateManyMutationInputSchema: z.ZodType<Prisma.ApplicationUpdateManyMutationInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  origProgramme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1074,10 +1115,12 @@ export const ApplicationUpdateManyMutationInputSchema: z.ZodType<Prisma.Applicat
   link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   isSponsored: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   verified: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  postChecked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const ApplicationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ApplicationUncheckedUpdateManyInput> = z.object({
   programme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  origProgramme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   company: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   type: z.union([ z.lazy(() => PositionTypeSchema),z.lazy(() => EnumPositionTypeFieldUpdateOperationsInputSchema) ]).optional(),
   engineering: z.union([ z.lazy(() => ApplicationUpdateengineeringInputSchema),z.lazy(() => EngineeringTypeSchema).array() ]).optional(),
@@ -1090,44 +1133,59 @@ export const ApplicationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Applica
   link: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   isSponsored: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   verified: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  postChecked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const AppConfigCreateInputSchema: z.ZodType<Prisma.AppConfigCreateInput> = z.object({
   id: z.string(),
   lastUpdated: z.coerce.date(),
-  shouldKeepUpdating: z.boolean()
+  shouldKeepUpdating: z.boolean(),
+  maxInEachDiscipline: z.number().int(),
+  maxInEachType: z.number().int()
 }).strict();
 
 export const AppConfigUncheckedCreateInputSchema: z.ZodType<Prisma.AppConfigUncheckedCreateInput> = z.object({
   id: z.string(),
   lastUpdated: z.coerce.date(),
-  shouldKeepUpdating: z.boolean()
+  shouldKeepUpdating: z.boolean(),
+  maxInEachDiscipline: z.number().int(),
+  maxInEachType: z.number().int()
 }).strict();
 
 export const AppConfigUpdateInputSchema: z.ZodType<Prisma.AppConfigUpdateInput> = z.object({
   lastUpdated: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   shouldKeepUpdating: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachDiscipline: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachType: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const AppConfigUncheckedUpdateInputSchema: z.ZodType<Prisma.AppConfigUncheckedUpdateInput> = z.object({
   lastUpdated: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   shouldKeepUpdating: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachDiscipline: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachType: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const AppConfigCreateManyInputSchema: z.ZodType<Prisma.AppConfigCreateManyInput> = z.object({
   id: z.string(),
   lastUpdated: z.coerce.date(),
-  shouldKeepUpdating: z.boolean()
+  shouldKeepUpdating: z.boolean(),
+  maxInEachDiscipline: z.number().int(),
+  maxInEachType: z.number().int()
 }).strict();
 
 export const AppConfigUpdateManyMutationInputSchema: z.ZodType<Prisma.AppConfigUpdateManyMutationInput> = z.object({
   lastUpdated: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   shouldKeepUpdating: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachDiscipline: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachType: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const AppConfigUncheckedUpdateManyInputSchema: z.ZodType<Prisma.AppConfigUncheckedUpdateManyInput> = z.object({
   lastUpdated: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   shouldKeepUpdating: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachDiscipline: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  maxInEachType: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
@@ -1406,6 +1464,7 @@ export const BoolFilterSchema: z.ZodType<Prisma.BoolFilter> = z.object({
 export const ApplicationCountOrderByAggregateInputSchema: z.ZodType<Prisma.ApplicationCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   programme: z.lazy(() => SortOrderSchema).optional(),
+  origProgramme: z.lazy(() => SortOrderSchema).optional(),
   company: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
   engineering: z.lazy(() => SortOrderSchema).optional(),
@@ -1417,12 +1476,14 @@ export const ApplicationCountOrderByAggregateInputSchema: z.ZodType<Prisma.Appli
   notes: z.lazy(() => SortOrderSchema).optional(),
   link: z.lazy(() => SortOrderSchema).optional(),
   isSponsored: z.lazy(() => SortOrderSchema).optional(),
-  verified: z.lazy(() => SortOrderSchema).optional()
+  verified: z.lazy(() => SortOrderSchema).optional(),
+  postChecked: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ApplicationMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ApplicationMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   programme: z.lazy(() => SortOrderSchema).optional(),
+  origProgramme: z.lazy(() => SortOrderSchema).optional(),
   company: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
   openDate: z.lazy(() => SortOrderSchema).optional(),
@@ -1433,12 +1494,14 @@ export const ApplicationMaxOrderByAggregateInputSchema: z.ZodType<Prisma.Applica
   notes: z.lazy(() => SortOrderSchema).optional(),
   link: z.lazy(() => SortOrderSchema).optional(),
   isSponsored: z.lazy(() => SortOrderSchema).optional(),
-  verified: z.lazy(() => SortOrderSchema).optional()
+  verified: z.lazy(() => SortOrderSchema).optional(),
+  postChecked: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ApplicationMinOrderByAggregateInputSchema: z.ZodType<Prisma.ApplicationMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   programme: z.lazy(() => SortOrderSchema).optional(),
+  origProgramme: z.lazy(() => SortOrderSchema).optional(),
   company: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
   openDate: z.lazy(() => SortOrderSchema).optional(),
@@ -1449,7 +1512,8 @@ export const ApplicationMinOrderByAggregateInputSchema: z.ZodType<Prisma.Applica
   notes: z.lazy(() => SortOrderSchema).optional(),
   link: z.lazy(() => SortOrderSchema).optional(),
   isSponsored: z.lazy(() => SortOrderSchema).optional(),
-  verified: z.lazy(() => SortOrderSchema).optional()
+  verified: z.lazy(() => SortOrderSchema).optional(),
+  postChecked: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const EnumPositionTypeWithAggregatesFilterSchema: z.ZodType<Prisma.EnumPositionTypeWithAggregatesFilter> = z.object({
@@ -1470,22 +1534,65 @@ export const BoolWithAggregatesFilterSchema: z.ZodType<Prisma.BoolWithAggregates
   _max: z.lazy(() => NestedBoolFilterSchema).optional()
 }).strict();
 
+export const IntFilterSchema: z.ZodType<Prisma.IntFilter> = z.object({
+  equals: z.number().optional(),
+  in: z.number().array().optional(),
+  notIn: z.number().array().optional(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntFilterSchema) ]).optional(),
+}).strict();
+
 export const AppConfigCountOrderByAggregateInputSchema: z.ZodType<Prisma.AppConfigCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   lastUpdated: z.lazy(() => SortOrderSchema).optional(),
-  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional()
+  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const AppConfigAvgOrderByAggregateInputSchema: z.ZodType<Prisma.AppConfigAvgOrderByAggregateInput> = z.object({
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AppConfigMaxOrderByAggregateInputSchema: z.ZodType<Prisma.AppConfigMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   lastUpdated: z.lazy(() => SortOrderSchema).optional(),
-  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional()
+  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const AppConfigMinOrderByAggregateInputSchema: z.ZodType<Prisma.AppConfigMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   lastUpdated: z.lazy(() => SortOrderSchema).optional(),
-  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional()
+  shouldKeepUpdating: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const AppConfigSumOrderByAggregateInputSchema: z.ZodType<Prisma.AppConfigSumOrderByAggregateInput> = z.object({
+  maxInEachDiscipline: z.lazy(() => SortOrderSchema).optional(),
+  maxInEachType: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const IntWithAggregatesFilterSchema: z.ZodType<Prisma.IntWithAggregatesFilter> = z.object({
+  equals: z.number().optional(),
+  in: z.number().array().optional(),
+  notIn: z.number().array().optional(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntFilterSchema).optional()
 }).strict();
 
 export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFieldUpdateOperationsInput> = z.object({
@@ -1631,6 +1738,14 @@ export const ApplicationUpdateengineeringInputSchema: z.ZodType<Prisma.Applicati
 
 export const BoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.BoolFieldUpdateOperationsInput> = z.object({
   set: z.boolean().optional()
+}).strict();
+
+export const IntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.IntFieldUpdateOperationsInput> = z.object({
+  set: z.number().optional(),
+  increment: z.number().optional(),
+  decrement: z.number().optional(),
+  multiply: z.number().optional(),
+  divide: z.number().optional()
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -1805,6 +1920,33 @@ export const NestedBoolWithAggregatesFilterSchema: z.ZodType<Prisma.NestedBoolWi
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedBoolFilterSchema).optional(),
   _max: z.lazy(() => NestedBoolFilterSchema).optional()
+}).strict();
+
+export const NestedIntWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntWithAggregatesFilter> = z.object({
+  equals: z.number().optional(),
+  in: z.number().array().optional(),
+  notIn: z.number().array().optional(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedIntWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _avg: z.lazy(() => NestedFloatFilterSchema).optional(),
+  _sum: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedIntFilterSchema).optional(),
+  _max: z.lazy(() => NestedIntFilterSchema).optional()
+}).strict();
+
+export const NestedFloatFilterSchema: z.ZodType<Prisma.NestedFloatFilter> = z.object({
+  equals: z.number().optional(),
+  in: z.number().array().optional(),
+  notIn: z.number().array().optional(),
+  lt: z.number().optional(),
+  lte: z.number().optional(),
+  gt: z.number().optional(),
+  gte: z.number().optional(),
+  not: z.union([ z.number(),z.lazy(() => NestedFloatFilterSchema) ]).optional(),
 }).strict();
 
 export const UserCreateWithoutHasSessionsInputSchema: z.ZodType<Prisma.UserCreateWithoutHasSessionsInput> = z.object({

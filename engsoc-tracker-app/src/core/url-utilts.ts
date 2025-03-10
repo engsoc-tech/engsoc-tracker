@@ -5,15 +5,15 @@ interface URLOptions {
 }
 
 export function getURL({ fullURL, useProxy }: URLOptions): string | Buffer {
-    console.log('Starting getURL function');
-    console.log(`Retry count: ${useProxy}`);
+    // console.log('Starting getURL function');
+    // console.log(`Retry count: ${useProxy}`);
 
     if (useProxy) {
-        console.log('Using proxy');
+        // console.log('Using proxy');
         try {
-            // const proxyUrl = useProxyURL(fullURL);
-            const proxyUrl = fullURL
-            console.log(`Proxy URL: ${proxyUrl}`);
+            const proxyUrl = UseProxyURL(fullURL);
+            // const proxyUrl = fullURL
+            // console.log(`Proxy URL: ${proxyUrl}`);
             return proxyUrl;
         } catch (error) {
             console.error('Error using proxy, falling back to direct URL:', error);
@@ -24,13 +24,13 @@ export function getURL({ fullURL, useProxy }: URLOptions): string | Buffer {
     return fullURL;
 }
 
-function useProxyURL(targetUrl: string): string {
-    console.log('Entering useProxyURL function');
+function UseProxyURL(targetUrl: string): string {
+    // console.log('Entering UseProxyURL function');
     const PROXY_URL = process.env.PROXY_URL;
     const PROXY_API_KEY = process.env.PROXY_API_KEY;
 
-    console.log(`PROXY_URL defined: ${!!PROXY_URL}`);
-    console.log(`PROXY_API_KEY defined: ${!!PROXY_API_KEY}`);
+    // console.log(`PROXY_URL defined: ${!!PROXY_URL}`);
+    // console.log(`PROXY_API_KEY defined: ${!!PROXY_API_KEY}`);
 
     if (!PROXY_URL || !PROXY_API_KEY) {
         console.error("PROXY_URL or PROXY_API_KEY is not defined in .env file.");
@@ -42,6 +42,6 @@ function useProxyURL(targetUrl: string): string {
         url: targetUrl
     })}`;
 
-    console.log(`Generated proxy URL: ${proxyUrl}`);
+    // console.log(`Generated proxy URL: ${proxyUrl}`);
     return proxyUrl;
 }

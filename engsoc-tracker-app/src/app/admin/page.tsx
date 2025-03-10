@@ -44,5 +44,5 @@ export default function AdminDashboardPage() {
         return <div>{error}</div>
     }
 
-    return <AdminDashboard serverSideData={serverSideData} />
+    return <AdminDashboard />
 }

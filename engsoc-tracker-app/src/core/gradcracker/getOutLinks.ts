@@ -3,7 +3,7 @@
 import puppeteer from 'puppeteer';
 import { getURL } from '../url-utilts';
 
-export async function getGradcrackerOutLink(jobUrl: string, testHtmlPath?: string): Promise<string> {
+export async function getGcOutLinkOrEmail(jobUrl: string, testHtmlPath?: string): Promise<{ outlink?: string, email?: string }> {
     let browser;
     console.log("Getting Gradcracker out link for job:", jobUrl);
     try {
@@ -35,10 +35,17 @@ export async function getGradcrackerOutLink(jobUrl: string, testHtmlPath?: strin
 
         const outLink = await page.evaluate(() => {
             const applyButton = document.querySelector('.js__apply-button') as HTMLAnchorElement;
+            console.log("APPLY HREF= ", applyButton.href == null ? "null" : applyButton.href)
             return applyButton?.href || null;
         });
-        console.log("reutrning outlinl ", outLink)
-        if (!outLink) return ""
+        console.log("returning outlink ", outLink)
+        if (!outLink) {
+            const email = await page.evaluate(() => {
+                const emailElement = document.querySelector('#how-to-apply a[href^="mailto:"]') as HTMLAnchorElement;
+                return emailElement ? emailElement.href.replace('mailto:', '') : null;
+            });
+            return ({ email: email || "" });
+        }
 
         // Navigate to the outlink and wait for all redirects to complete
         console.log("Following outlink:", outLink)
@@ -52,10 +59,10 @@ export async function getGradcrackerOutLink(jobUrl: string, testHtmlPath?: strin
         const finalOutLink = page.url()
         console.log("Final URL after redirects:", finalOutLink)
 
-        return finalOutLink.replace('gradcracker', 'engsoc').replace('Gradcracker', 'EngSoc');
+        return ({ outlink: finalOutLink.replace('gradcracker', 'engsoc').replace('Gradcracker', 'EngSoc') })
     } catch (error) {
         console.error('Error getting Gradcracker out link:', error);
-        return "";
+        return ({ email: "" });
     } finally {
         if (browser) await browser.close();
     }

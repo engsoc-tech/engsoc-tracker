@@ -9,8 +9,8 @@ const developers: Developer[] = [
         link: "tye.jpg",
         linkedinUrl: "https://www.linkedin.com/in/tye-goulder/",
         websiteUrl: "https://buildwithtye.com",
-        roleInProject: "Lead Developer",
-        roleInEngSoc: "Tech Representitive"
+        roleInProject: "Developer",
+        roleInEngSoc: "Vice-President"
     },
 
     // { name: "Ege Cavus", roleInProject: 'Project Supervisor', roleInEngSoc: 'Technology Officer', link: "https://images.squarespace-cdn.com/content/v1/62adc0df9ad5a8506ebfd27e/507c9700-ceed-4942-bfcc-f2f255b475de/WhatsApp+Image+2024-05-29+at+10.10.52_f4f2da27.jpg?format=750w" }
@@ -93,7 +93,7 @@ function DeveloperProfilePictures({ developers }: { developers: Developer[] }) {
                         />
                         <div>
                             <h5 className="text-md font-semibold text-gray-100">{developer.name}</h5>
-                            <p className="text-gray-300 text-sm">{developer.roleInProject}, {developer.roleInEngSoc} in EngSoc</p>
+                            <p className="text-gray-300 text-sm">{developer.roleInProject}, {developer.roleInEngSoc}</p>
                         </div>
                     </div>
                     {index !== developers.length - 1 && <Separator className='h-auto opacity-10' orientation='vertical' />}

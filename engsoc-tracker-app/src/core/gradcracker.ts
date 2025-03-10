@@ -3,10 +3,11 @@ import { ApplicationType } from './../schemas/applications';
 import puppeteer from 'puppeteer';
 import { getURL } from './url-utilts';
 import { EngineeringType, PositionType } from '@prisma/client';
-import { getGradcrackerOutLink } from './gradcracker/getOutLinks';
+import { getGcOutLinkOrEmail } from './gradcracker/getOutLinks';
 import { addYears, format, parse } from 'date-fns';
-import { updateApplication } from './applications';
-
+import prisma from '@/db/prisma';
+import { saveApplicationToDatabaseAndScrambleName } from './main';
+import * as crypto from 'crypto';
 
 export async function parseDate(dateString: string): Promise<Date> {
   console.log(`Attempting to parse date: ${dateString}`);
@@ -54,29 +55,44 @@ function mapToEngineeringType(type: string): EngineeringType | null {
     'mechanical': EngineeringType.Mechanical,
     'software': EngineeringType.Software,
     // Add common variations
+    'technology': EngineeringType.Computing,
+
     'electrical': EngineeringType.Electronic,
     'computer': EngineeringType.Computing,
     'data': EngineeringType.Computing,
   };
 
-  return engineeringTypeMap[cleanType] || null;
+  // Direct match
+  if (engineeringTypeMap[cleanType]) {
+    return engineeringTypeMap[cleanType];
+  }
+
+  // Check if type contains any of the known engineering types
+  for (const key in engineeringTypeMap) {
+    if (type.toLowerCase().includes(key)) {
+      return engineeringTypeMap[key];
+    }
+  }
+
+  return null;
 }
-export async function scrapeGradcracker(type: GradCrackerDiscipline | "" = 'all-disciplines', testHtmlPath?: string): Promise<ApplicationType[]> {
-  console.log("Scrape Gradcracker discipline called with type:", type);
+export async function scrapeGradcracker(maxOfEachDisc: number): Promise<ApplicationType[]> {
+  console.log("Scrape Gradcracker discipline called with maxOfEachDisc:", maxOfEachDisc);
   try {
     const disciplinesToScrape: GradCrackerDiscipline[] = [
-      'all-disciplines',
+      // 'all-disciplines',
       // 'aerospace',
       // 'chemical-process',
       // 'civil-building',
-      // 'computing-technology',
+      'computing-technology',
       // 'electronic-electrical',
       // 'mechanical-engineering'
     ];
-    let gradCrackerApps: ApplicationType[] = [];
+    const gradCrackerApps: ApplicationType[] = [];
     for (const discipline of disciplinesToScrape) {
-      const disciplineApps = await scrapeGradcrackerDiscipline(discipline);
-      gradCrackerApps = [...gradCrackerApps, ...disciplineApps];
+      const disciplineAppsGrad = await scrapeGradcrackerDiscipline(discipline, maxOfEachDisc, "engineering-graduate-jobs");
+      const disciplineAppsPlaceInt = await scrapeGradcrackerDiscipline(discipline, maxOfEachDisc, "engineering-work-placements-internships");
+      gradCrackerApps.push(...disciplineAppsGrad, ...disciplineAppsPlaceInt);
     }
     return gradCrackerApps;
   } catch (error) {
@@ -85,7 +101,7 @@ export async function scrapeGradcracker(type: GradCrackerDiscipline | "" = 'all-
   }
 }
 
-export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline | ""): Promise<ApplicationType[]> {
+export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipline | "", max: number, type: "engineering-graduate-jobs" | "engineering-work-placements-internships"): Promise<ApplicationType[]> {
   let browser;
   console.log("Scrape Gradcracker discipline called with discipline:", discipline);
   try {
@@ -103,7 +119,7 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
     const page = await browser.newPage();
 
     console.log('Fetching Gradcracker search page...');
-    const originalURL = `https://www.gradcracker.com/search/${discipline}/engineering-jobs`;
+    const originalURL = `https://www.gradcracker.com/search/${discipline}/${type}`;
     //replace useProxy with process.env.NODE_ENV === 'production' if gradcracker starts blocking the request
     const targetURL = getURL({ fullURL: originalURL, useProxy: true });
     console.log(`Target URL: ${targetURL}`);
@@ -137,7 +153,7 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
       engineering: string[];
       deadlineString: string;
       type: PositionType;
-    }[] = await page.evaluate(() => {
+    }[] = await page.evaluate((maxLimit: number, appType: "engineering-graduate-jobs" | "engineering-work-placements-internships") => {
       const apps: {
         company: string;
         programme: string;
@@ -146,7 +162,7 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
         deadlineString: string;
         type: PositionType;
       }[] = [];
-      const ApplicationElements = document.querySelectorAll('.tw-relative.tw-mb-4.tw-border-2.tw-border-gray-200.tw-rounded');
+      const ApplicationElements = document.querySelectorAll('.tw-relative.tw-mb-4.tw-border-2.tw-border-gray-200.tw-rounded')
 
       for (const ApplicationElement of ApplicationElements) {
         const company = ApplicationElement.querySelector('img')?.alt?.trim() || '-';
@@ -154,7 +170,6 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
         const _link = ApplicationElement.querySelector('a.tw-block.tw-text-base.tw-font-semibold')?.getAttribute('href') || '';
         const engineeringText = ApplicationElement.querySelector('.tw-text-xs.tw-font-bold.tw-text-gray-800')?.textContent?.trim() || '';
         const engineering = engineeringText.split(',').map(type => type.trim());
-
         let deadlineString = '';
         let type: PositionType = 'Graduate';
 
@@ -165,27 +180,35 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
 
           if (key === 'Deadline') {
             deadlineString = value;
-          } else if (key === 'Job type') {
-            const lowercaseValue = value.toLowerCase();
-            if (lowercaseValue.includes('placement') || lowercaseValue.includes('internship')) {
-              type = lowercaseValue.includes('year') ? 'Placement' : 'Internship';
-            }
+            console.log("VALUE: ", value);
           }
         });
+        if (appType == "engineering-work-placements-internships") {
+          if (title.includes("Intern")) {
+            type = "Internship";
+          } else {
+            type = "Placement";
+          }
+        }
 
-        apps.push({
-          company,
-          programme: title,
-          link: _link,
-          engineering,
-          deadlineString,
-          type,
-        });
+        if (apps.length <= maxLimit) {
+
+          apps.push({
+            company,
+            programme: title,
+            link: _link,
+            engineering,
+            deadlineString,
+            type,
+          });
+        } else {
+          break;
+        }
       }
 
       return apps
-    });
-
+    }, max, type);
+    console.log("Page Applications: ", pageApplications);
     const applications: ApplicationType[] = [];
     for (const appData of pageApplications) {
       let closeDate: Date;
@@ -208,10 +231,12 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
         .filter((type): type is EngineeringType => type !== null);
 
       // Only create application if we have at least one valid engineering type
-      if (validEngineeringTypes.length > 0 && appData.programme) {
+      if (validEngineeringTypes.length > 0 && appData.programme && appData.link) {
         const details: ApplicationType = {
           id: `${appData.company || "Unknown"}-${appData.programme}`.replace(/[\s-]+/g, '-').toLowerCase(),
           programme: appData.programme,
+          postChecked: false,
+          origProgramme: appData.programme,
           company: appData.company || 'Unknown',
           verified: false,
           type: appData.type,
@@ -225,30 +250,33 @@ export async function scrapeGradcrackerDiscipline(discipline: GradCrackerDiscipl
           notes: "",
           link: appData.link,
         };
-        applications.push(details);
 
-        console.log('Extracted application:', {
-          company: details.company,
-          programme: details.programme,
-          type: details.type,
-          engineering: details.engineering,
-          deadline: format(details.closeDate, 'PPP'),
-        });
+        //get true outlink
+        const res = await getGcOutLinkOrEmail(details.link);
+        details.link = res.outlink || crypto.randomBytes(20).toString('hex');
+        if (!res.outlink) {
+          //look for the how to apply email and add it to details.notes as 'CV and Cover Letter to: email'
+          details.notes = `CV and Cover Letter to: ${res.email || 'Unknown'}`;
+        }
+        //save and scramble
+        const pc = await saveApplicationToDatabaseAndScrambleName(details);
+        applications.push(pc);
+
+        // console.log('Extracted application with true out link:', {
+        //   company: pc.company,
+        //   origProgramme: pc.origProgramme,
+        //   programme: pc.programme,
+        //   type: pc.type,
+        //   engineering: pc.engineering,
+        //   closeDate: pc.closeDate,
+        //   link: pc.link,
+        // });
+
       } else {
         console.log('Skipping application due to no valid engineering types or programme:', appData);
       }
     }
-
-    const applicationsWithUpdatedLinks = [];
-    for (const app of applications) {
-      const link = await getGradcrackerOutLink(app.link);
-      applicationsWithUpdatedLinks.push({ ...app, link });
-      await updateApplication(`${app.company}-${app.programme}`.replace(/[\s-]+/g, '-').toLowerCase(), { ...app, link });
-      await new Promise(resolve => setTimeout(resolve, 15000));
-    }
-    console.log("Applications with updated links: ", applicationsWithUpdatedLinks);
-
-    return applicationsWithUpdatedLinks;
+    return applications;
 
 
 

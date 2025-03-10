@@ -69,8 +69,8 @@ function useProxy(targetUrl: string): string {
     const PROXY_URL = process.env.PROXY_URL;
     const PROXY_API_KEY = process.env.PROXY_API_KEY;
 
-    console.log(`PROXY_URL defined: ${!!PROXY_URL}`);
-    console.log(`PROXY_API_KEY defined: ${!!PROXY_API_KEY}`);
+    // console.log(`PROXY_URL defined: ${!!PROXY_URL}`);
+    // console.log(`PROXY_API_KEY defined: ${!!PROXY_API_KEY}`);
 
     if (!PROXY_URL || !PROXY_API_KEY) {
         console.error("PROXY_URL or PROXY_API_KEY is not defined in .env file.");
@@ -82,7 +82,7 @@ function useProxy(targetUrl: string): string {
         url: targetUrl
     })}`;
 
-    console.log(`Generated proxy URL: ${proxyUrl}`);
+    // console.log(`Generated proxy URL: ${proxyUrl}`);
     return proxyUrl;
 }
 

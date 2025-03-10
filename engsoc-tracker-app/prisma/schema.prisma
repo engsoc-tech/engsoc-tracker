@@ -79,8 +79,9 @@ enum EngineeringType {
 }
 
 model Application {
-    id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+    id                     String            @id @map("_id")
     programme              String
+    origProgramme          String
     company                String
     type                   PositionType
     engineering            EngineeringType[]
@@ -93,10 +94,13 @@ model Application {
     link                   String            @unique
     isSponsored            Boolean           @default(false)
     verified               Boolean           @default(false)
+    postChecked            Boolean           @default(false)
 }
 
 model AppConfig {
-    id                 String   @id @map("_id")
-    lastUpdated        DateTime
-    shouldKeepUpdating Boolean
+    id                  String   @id @map("_id")
+    lastUpdated         DateTime
+    shouldKeepUpdating  Boolean
+    maxInEachDiscipline Int
+    maxInEachType       Int
 }

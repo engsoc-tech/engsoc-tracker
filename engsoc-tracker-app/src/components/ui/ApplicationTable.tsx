@@ -30,7 +30,6 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
-import { mockApplications } from "@/lib/mock-data"
 import { ApplicationType } from "@/schemas/applications"
 import { EngineeringType } from "@prisma/client"
 import { EngineeringTypes, SelectableEngineeringType, SelectableEngineeringTypes, SelectablePositonType } from "@/core/map"
@@ -194,7 +193,7 @@ export default function ApplicationTable({ }) {
                                         format(new Date(app.openDate), 'dd/MM/yyyy')
                                     }</TableCell>
                                     <TableCell>
-                                        <Badge className={`${getDeadlineStatus(app.closeDate instanceof Date ? app.closeDate.toISOString() : app.closeDate)} cursor-pointer`}>
+                                        <Badge className={`${getDeadlineStatus(app.closeDate instanceof Date ? app.closeDate.toISOString() : app.closeDate)} w-[5.4rem] cursor-pointer`}>
                                             {app.closeDate &&
                                                 differenceInMonths(
                                                     app.closeDate instanceof Date ? app.closeDate : parseISO(app.closeDate),
@@ -228,13 +227,16 @@ export default function ApplicationTable({ }) {
                                             <X className="h-4 w-4 text-black" />
                                         )}
                                     </TableCell>
-                                    <TableCell className="hidden lg:table-cell max-w-[200px] truncate">
+                                    <TableCell className="hidden lg:table-cell max-w-[200px] overflow-x-auto">
                                         {app.notes}
                                     </TableCell>
                                     <TableCell>
-                                        <a href={app.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                        <a href={app.link} style={{
+                                            pointerEvents: app.link.startsWith("http") ? "auto" : "none",
+                                        }} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                             Apply
                                         </a>
+
                                     </TableCell>
                                 </TableRow>
                             ))}
